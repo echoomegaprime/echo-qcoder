@@ -79,10 +79,16 @@ function runCheck(check) {
 export function sanitizeOutput(value) {
   return value
     .replace(/Authorization:\s*(?:Bearer|Basic)\s+\S+/giu, "Authorization: [REDACTED]")
-    .replace(/\b[A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|CREDENTIAL|API_KEY)\b\s*[:=]\s*\S+/giu, "[REDACTED_SECRET]")
+    .replace(
+      /\b[A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|CREDENTIAL|API_KEY)\b\s*[:=]\s*\S+/giu,
+      "[REDACTED_SECRET]",
+    )
     .replace(/(?:sk-|gh[pousr]_)[A-Za-z0-9_-]{20,}/gu, "[REDACTED_TOKEN]")
     .replace(/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/gu, "[REDACTED_PRIVATE_KEY]")
-    .replace(/\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b/gu, "[PRIVATE_ADDRESS]")
+    .replace(
+      /\b(?:10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b/gu,
+      "[PRIVATE_ADDRESS]",
+    )
     .replace(/\b[A-Za-z]:\\[^\s"']+/gu, "[LOCAL_PATH]")
     .replace(/\/(?:home|Users)\/[^\s"']+/gu, "[LOCAL_PATH]")
     .trim()
