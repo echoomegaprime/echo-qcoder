@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "qcoder": {
+      "cwd": ".",
+      "command": "node",
+      "args": ["./server/dist/index.js", "--stdio"],
+      "env": { "QCODER_TRUSTED_STDIO": "1" }
+    }
+  }
+}

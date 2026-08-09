@@ -1,0 +1,14 @@
+interface:
+  display_name: "QCoder Session Operator"
+  short_description: "Operate governed QCoder builder sessions safely"
+dependencies:
+  mcp_servers:
+    - name: qcoder
+      tools:
+        - list_qcoder_sessions
+        - get_qcoder_session
+        - preview_qcoder_task
+        - start_qcoder_session
+        - send_qcoder_task
+        - stop_qcoder_session
+        - render_qcoder_console

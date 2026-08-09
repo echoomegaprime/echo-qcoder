@@ -17,6 +17,8 @@ coverage/
 # Runtime state and logs
 .qcoder/
 runtime/
+.runtime/
+.agents/plugins/plugins/
 logs/
 *.log
 *.pid
@@ -32,4 +34,3 @@ artifacts/
 Thumbs.db
 .idea/
 .vscode/
-

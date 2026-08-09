@@ -1,0 +1,32 @@
+{
+  "name": "echo-qcoder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Governed QCoder launcher and private ChatGPT/Codex control plugin",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
+  },
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace web && npm run build --workspace server",
+    "typecheck": "npm run typecheck --workspace server && npm run typecheck --workspace web",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "test": "npm run test --workspace server && npm run test --workspace web && node ./scripts/evaluate-golden.mjs",
+    "test:coverage": "npm run test:coverage --workspace server && npm run test:coverage --workspace web",
+    "verify": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.8.1",
+    "globals": "16.5.0",
+    "jsdom": "29.1.1",
+    "prettier": "3.9.6",
+    "typescript-eslint": "8.66.0"
+  }
+}

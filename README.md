@@ -7,4 +7,3 @@ The implementation is under active construction. Release claims and exact verifi
 ## Security boundary
 
 QCoder does not expose an unrestricted remote shell. Remote clients operate named QCoder sessions through strict tool contracts, scoped workspaces, bounded tasks, authorization, audit records, and explicit stop controls.
-
