@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -35,8 +35,30 @@ if (entry?.source?.source !== "local" || entry.source.path !== "./plugins/echo-q
 const skill = readFileSync(resolve(root, "skills/qcoder-session-operator/SKILL.md"), "utf8");
 if (!/^---\r?\nname: qcoder-session-operator\r?\ndescription:/u.test(skill))
   errors.push("skill front matter is invalid");
+const qwenSkillsRoot = resolve(root, "qwen-skills");
+const qwenSkillNames = [
+  "qcoder-coding-builder",
+  "qcoder-authorized-security",
+  "qcoder-vision-operator",
+  "qcoder-audio-operator",
+];
+for (const name of qwenSkillNames) {
+  const path = resolve(qwenSkillsRoot, name, "SKILL.md");
+  if (!existsSync(path)) {
+    errors.push(`Qwen skill is missing: ${name}`);
+    continue;
+  }
+  const source = readFileSync(path, "utf8");
+  if (!new RegExp(`^---\\r?\\nname: ${name}\\r?\\ndescription:`, "u").test(source))
+    errors.push(`Qwen skill front matter is invalid: ${name}`);
+}
+for (const entry of readdirSync(qwenSkillsRoot, { withFileTypes: true })) {
+  if (entry.isDirectory() && !qwenSkillNames.includes(entry.name))
+    errors.push(`unexpected Qwen skill directory: ${entry.name}`);
+}
 const definitionsPath = resolve(root, "server/dist/tools/definitions.js");
-if (existsSync(definitionsPath)) {
+const archiveMode = process.argv.includes("--archive");
+if (existsSync(definitionsPath) && !archiveMode) {
   const { toolDefinitions } = await import(pathToFileURL(definitionsPath));
   if (toolDefinitions.length !== 7 || new Set(toolDefinitions.map((tool) => tool.name)).size !== 7)
     errors.push("tool inventory is invalid");
@@ -48,6 +70,26 @@ if (existsSync(definitionsPath)) {
         errors.push(`${tool.name} missing ${hint}`);
     if (!tool.securitySchemes?.[0]?.scopes?.length)
       errors.push(`${tool.name} missing security scheme`);
+  }
+} else if (archiveMode) {
+  const definitionsSource = readFileSync(resolve(root, "server/src/tools/definitions.ts"), "utf8");
+  const expectedTools = [
+    "list_qcoder_sessions",
+    "get_qcoder_session",
+    "preview_qcoder_task",
+    "start_qcoder_session",
+    "send_qcoder_task",
+    "stop_qcoder_session",
+    "render_qcoder_console",
+  ];
+  for (const name of expectedTools) {
+    if (!definitionsSource.includes(`name: "${name}"`))
+      errors.push(`archive tool inventory missing ${name}`);
+  }
+  for (const hint of ["readOnlyHint", "destructiveHint", "openWorldHint", "idempotentHint"]) {
+    const count = definitionsSource.match(new RegExp(`${hint}:`, "gu"))?.length ?? 0;
+    if (count < expectedTools.length)
+      errors.push(`archive tool metadata has only ${count} ${hint} entries`);
   }
 }
 const serverSource = readFileSync(resolve(root, "server/src/server.ts"), "utf8");

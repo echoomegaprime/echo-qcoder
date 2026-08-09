@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { redactText, redactUnknown } from "../src/logging.js";
+import { redactTranscriptText } from "../src/services/transcriptStore.js";
 
 describe("logging redaction", () => {
   it("redacts bearer tokens, API keys, cookies, and secret-like assignments", () => {
@@ -20,5 +21,14 @@ describe("logging redaction", () => {
       nested: { authorization: "[REDACTED]", safe: "ok" },
     });
     expect(input.token).toBe("raw");
+  });
+
+  it("uses the same assignment redaction for persisted transcripts and outcomes", () => {
+    const output = redactTranscriptText(
+      "QCODER_OAUTH_CLIENT_SECRET=private SOL_BROKER_TOKEN=opaque Authorization: Bearer token",
+    );
+    expect(output).not.toContain("private");
+    expect(output).not.toContain("opaque");
+    expect(output).not.toContain("Bearer token");
   });
 });

@@ -124,14 +124,27 @@ foreach ($switchName in @(
 
 $priorDefaults = $env:QWEN_CODE_SYSTEM_SETTINGS_PATH
 $priorTarget = $env:QCODER_TARGET_DIR
+$priorLeaseToken = $env:QCODER_GPU_LEASE_TOKEN
 $leaseToken = $null
 $leaseHeartbeat = $null
 $leaseMutex = $null
 $leaseMutexAcquired = $false
+$supervisorWatchdog = $null
 $exitCode = 1
-$env:QWEN_CODE_SYSTEM_SETTINGS_PATH = Join-Path $PSScriptRoot 'qwen-settings.json'
+$settingsName = if ($env:QCODER_PLUGIN_MODE -eq '1') { 'qwen-plugin-settings.json' } else { 'qwen-settings.json' }
+$env:QWEN_CODE_SYSTEM_SETTINGS_PATH = Join-Path $PSScriptRoot $settingsName
 $env:QCODER_TARGET_DIR = $targetWorkspace
 try {
+    if ($env:QCODER_PLUGIN_MODE -eq '1' -and $env:QCODER_SUPERVISOR_PID -match '^\d+$') {
+        $supervisorWatchdog = Start-Job -ArgumentList ([int]$env:QCODER_SUPERVISOR_PID), $PID -ScriptBlock {
+            param($SupervisorPid, $LauncherPid)
+            $ErrorActionPreference = 'SilentlyContinue'
+            while (Get-Process -Id $SupervisorPid -ErrorAction SilentlyContinue) {
+                Start-Sleep -Seconds 2
+            }
+            Stop-Process -Id $LauncherPid -Force -ErrorAction SilentlyContinue
+        }
+    }
     if (-not $NoGpuLease -and -not $DryRun) {
         if (-not (Get-Command ssh -CommandType Application -ErrorAction SilentlyContinue)) {
             throw 'OpenSSH is required for the governed FORGE GPU lease.'
@@ -158,6 +171,7 @@ try {
             }
         }
     }
+    Remove-Item Env:QCODER_GPU_LEASE_TOKEN -ErrorAction SilentlyContinue
     if ($AdditionalArguments) {
         & $codexAutoPath @launcher @AdditionalArguments
     } else {
@@ -165,6 +179,10 @@ try {
     }
     $exitCode = $LASTEXITCODE
 } finally {
+    if ($supervisorWatchdog) {
+        Stop-Job -Job $supervisorWatchdog -ErrorAction SilentlyContinue
+        Remove-Job -Job $supervisorWatchdog -Force -ErrorAction SilentlyContinue
+    }
     if ($leaseHeartbeat) {
         Stop-Job -Job $leaseHeartbeat -ErrorAction SilentlyContinue
         Remove-Job -Job $leaseHeartbeat -Force -ErrorAction SilentlyContinue
@@ -187,6 +205,11 @@ try {
         Remove-Item Env:QCODER_TARGET_DIR -ErrorAction SilentlyContinue
     } else {
         $env:QCODER_TARGET_DIR = $priorTarget
+    }
+    if ($null -eq $priorLeaseToken) {
+        Remove-Item Env:QCODER_GPU_LEASE_TOKEN -ErrorAction SilentlyContinue
+    } else {
+        $env:QCODER_GPU_LEASE_TOKEN = $priorLeaseToken
     }
 }
 exit $exitCode

@@ -1,0 +1,10 @@
+{
+  "name": "echo-qcoder-mcp-inspector-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Isolated, lockfile-pinned MCP Inspector used by QCoder protocol verification.",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/inspector": "2.1.0"
+  }
+}

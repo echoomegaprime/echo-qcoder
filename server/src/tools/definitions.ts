@@ -150,7 +150,7 @@ export const toolDefinitions: readonly ToolDefinition[] = [
     outputSchema: outputSchemas.start,
     annotations: {
       readOnlyHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
       openWorldHint: true,
       idempotentHint: true,
     },
@@ -165,7 +165,7 @@ export const toolDefinitions: readonly ToolDefinition[] = [
     outputSchema: outputSchemas.send,
     annotations: {
       readOnlyHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
       openWorldHint: true,
       idempotentHint: true,
     },

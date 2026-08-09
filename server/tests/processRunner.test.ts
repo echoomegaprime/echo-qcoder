@@ -28,6 +28,7 @@ describe("governed QCoder process launch", () => {
       ),
     ).toBe(true);
     expect(spec.options.env?.QCODER_GPU_LEASE_TOKEN).toBe("c".repeat(32));
+    expect(spec.options.env?.QCODER_PLUGIN_MODE).toBe("1");
   });
 
   it("passes metacharacters as data instead of a command string", () => {
@@ -48,5 +49,36 @@ describe("governed QCoder process launch", () => {
     expect(spec.args).toContain(
       "safe\n\nCurrent governed task:\ntest; Remove-Item C:\\never-executed",
     );
+  });
+
+  it("passes only the minimum process environment to the governed child", () => {
+    process.env.QCODER_OAUTH_CLIENT_SECRET = "must-never-reach-qwen";
+    process.env.SOL_BROKER_TOKEN = "parent-mission-secret";
+    process.env.AWS_SECRET_ACCESS_KEY = "cloud-secret";
+    try {
+      const spec = buildLaunchSpec(
+        {
+          powershellPath: "pwsh",
+          launcherPath: "C:\\fixed\\qcoder.ps1",
+          leaseReleaseCommand: "ssh",
+        },
+        {
+          sessionId: `qcs_${"a".repeat(32)}`,
+          taskId: `qct_${"b".repeat(32)}`,
+          workspacePath: "C:\\allowed",
+          role: "builder",
+          mission: "safe",
+          task: "edit the allowlisted workspace",
+          leaseToken: "c".repeat(32),
+        },
+      );
+      expect(spec.options.env?.QCODER_OAUTH_CLIENT_SECRET).toBeUndefined();
+      expect(spec.options.env?.SOL_BROKER_TOKEN).toBeUndefined();
+      expect(spec.options.env?.AWS_SECRET_ACCESS_KEY).toBeUndefined();
+    } finally {
+      delete process.env.QCODER_OAUTH_CLIENT_SECRET;
+      delete process.env.SOL_BROKER_TOKEN;
+      delete process.env.AWS_SECRET_ACCESS_KEY;
+    }
   });
 });

@@ -27,6 +27,7 @@ function bearerToken(request: Request): string | null {
 
 export function createHttpApp(dependencies: HttpAppDependencies) {
   const app = createMcpExpressApp({ host: dependencies.host });
+  app.set("trust proxy", false);
   const windows = new Map<string, { started: number; count: number }>();
   app.use((request: Request, response: Response, next: NextFunction) => {
     const correlationId = request.header("x-correlation-id") ?? randomUUID();
@@ -34,6 +35,11 @@ export function createHttpApp(dependencies: HttpAppDependencies) {
     response.setHeader("x-content-type-options", "nosniff");
     response.setHeader("referrer-policy", "no-referrer");
     response.setHeader("cache-control", "no-store");
+    const contentLength = Number(request.header("content-length") ?? "0");
+    if (Number.isFinite(contentLength) && contentLength > 256 * 1024) {
+      response.status(413).json({ error: "request_too_large", correlation_id: correlationId });
+      return;
+    }
     const key = createRateLimitKey(request);
     const current = windows.get(key);
     const now = Date.now();
@@ -106,8 +112,8 @@ export function createHttpApp(dependencies: HttpAppDependencies) {
 }
 
 function createRateLimitKey(request: Request): string {
-  const token = bearerToken(request);
-  return token
-    ? `token:${createHash("sha256").update(token).digest("hex").slice(0, 16)}`
-    : `ip:${request.ip ?? "unknown"}`;
+  return `ip:${createHash("sha256")
+    .update(request.ip ?? "unknown")
+    .digest("hex")
+    .slice(0, 16)}`;
 }

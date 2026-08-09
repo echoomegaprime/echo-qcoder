@@ -1,6 +1,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { AppError } from "../errors.js";
+import { redactText } from "../logging.js";
 
 const SESSION_ID = /^qcs_[a-f0-9]{32}$/u;
 const MAX_ENTRY_TEXT = 2_000;
@@ -13,7 +14,7 @@ export interface TranscriptEntry {
 }
 
 export function redactTranscriptText(value: string): string {
-  return value
+  return redactText(value)
     .replace(/(authorization\s*:\s*bearer\s+)[^\s"']+/giu, "$1[REDACTED]")
     .replace(/([?&](?:api[_-]?key|access_token|token)=)[^&\s]+/giu, "$1[REDACTED]")
     .replace(/\b(sk-[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9_]{16,})\b/gu, "[REDACTED]");
@@ -32,11 +33,7 @@ export class TranscriptStore {
     if (existsSync(path) && statSync(path).size >= MAX_TRANSCRIPT_BYTES) {
       const archived = `${path}.1`;
       if (existsSync(archived)) {
-        throw new AppError(
-          "RATE_LIMITED",
-          "The QCoder transcript reached its retention limit.",
-          429,
-        );
+        return;
       }
       renameSync(path, archived);
     }

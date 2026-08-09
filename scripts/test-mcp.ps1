@@ -18,7 +18,7 @@ New-Item -ItemType Directory -Path $testRuntime -Force | Out-Null
 $stdout = Join-Path $testRuntime 'server.stdout.log'
 $stderr = Join-Path $testRuntime 'server.stderr.log'
 $prior = @{}
-foreach ($name in 'HOST','PORT','QCODER_DATA_DIR','QCODER_OAUTH_INTROSPECTION_URL','QCODER_OAUTH_CLIENT_ID','QCODER_OAUTH_CLIENT_SECRET') {
+foreach ($name in 'HOST','PORT','QCODER_DATA_DIR','QCODER_OAUTH_INTROSPECTION_URL','QCODER_OAUTH_CLIENT_ID','QCODER_OAUTH_CLIENT_SECRET','QCODER_OAUTH_ALLOWED_CLIENT_IDS') {
     $prior[$name] = [Environment]::GetEnvironmentVariable($name)
 }
 $process = $null
@@ -29,6 +29,7 @@ try {
     $env:QCODER_OAUTH_INTROSPECTION_URL = 'https://127.0.0.1:65534/introspect'
     $env:QCODER_OAUTH_CLIENT_ID = 'qcoder-local-protocol-test'
     $env:QCODER_OAUTH_CLIENT_SECRET = 'local-test-value-not-a-credential'
+    $env:QCODER_OAUTH_ALLOWED_CLIENT_IDS = 'chatgpt-qcoder'
     $process = Start-Process -FilePath (Get-Command node).Source -ArgumentList '.\server\dist\index.js' -WorkingDirectory $root -PassThru -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr
     $healthy = $false
     for ($attempt = 0; $attempt -lt 50; $attempt++) {
@@ -45,7 +46,11 @@ try {
     & node .\scripts\mcp-smoke.mjs "http://127.0.0.1:$Port/mcp"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     if ($Inspector) {
-        & npx --yes '@modelcontextprotocol/inspector@2.1.0' --cli "http://127.0.0.1:$Port/mcp" --method tools/list
+        $inspector = Join-Path $root 'scripts\inspector\node_modules\.bin\mcp-inspector.cmd'
+        if (-not (Test-Path -LiteralPath $inspector)) {
+            throw 'Locked MCP Inspector dependency is not installed. Run npm ci --prefix scripts/inspector.'
+        }
+        & $inspector --cli "http://127.0.0.1:$Port/mcp" --method tools/list
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
     Write-Host "QCODER_MCP_SMOKE_OK health=ok ready=ready version=$($version.version)"

@@ -28,10 +28,16 @@ describe("tool metadata", () => {
 
   it("labels actual side effects accurately", () => {
     const start = toolDefinitions.find((tool) => tool.name === "start_qcoder_session");
+    const send = toolDefinitions.find((tool) => tool.name === "send_qcoder_task");
     const stop = toolDefinitions.find((tool) => tool.name === "stop_qcoder_session");
     expect(start?.annotations).toMatchObject({
       readOnlyHint: false,
-      destructiveHint: false,
+      destructiveHint: true,
+      openWorldHint: true,
+    });
+    expect(send?.annotations).toMatchObject({
+      readOnlyHint: false,
+      destructiveHint: true,
       openWorldHint: true,
     });
     expect(stop?.annotations).toMatchObject({

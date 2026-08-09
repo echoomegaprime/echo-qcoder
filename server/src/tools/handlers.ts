@@ -151,9 +151,10 @@ function failure(context: HandlerContext, error: unknown): ToolResult {
     content: [{ type: "text", text: `${normalized.code}: ${normalized.message}` }],
   };
   if (["AUTH_REQUIRED", "AUTH_INVALID", "SCOPE_REQUIRED"].includes(normalized.code)) {
+    const error = normalized.code === "SCOPE_REQUIRED" ? "insufficient_scope" : "invalid_token";
     result._meta = {
       "mcp/www_authenticate": [
-        `Bearer resource_metadata="${context.protectedResourceMetadataUrl}", error="invalid_token"`,
+        `Bearer resource_metadata="${context.protectedResourceMetadataUrl}", error="${error}"`,
       ],
     };
   }

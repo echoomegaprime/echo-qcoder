@@ -3,6 +3,8 @@ export type ErrorCode =
   | "AUTH_INVALID"
   | "SCOPE_REQUIRED"
   | "TENANT_FORBIDDEN"
+  | "WORKSPACE_FORBIDDEN"
+  | "ROLE_FORBIDDEN"
   | "NOT_FOUND"
   | "CONFLICT"
   | "INVALID_INPUT"

@@ -35,6 +35,8 @@ const principal: AuthPrincipal = {
     "qcoder.sessions.stop",
   ]),
   expiresAt: 4_102_444_800,
+  allowedRoles: new Set(["builder", "cli-build"]),
+  allowedWorkspaces: new Set(["echo-qcoder"]),
 };
 
 function fixture() {
@@ -115,6 +117,33 @@ describe("QCoder session service", () => {
     });
     expect(stopped.status).toMatch(/stopping|stopped/u);
     expect(runner.stopped).toContain(started.session.session_id);
+    repository.close();
+  });
+
+  it("rejects roles and workspaces not granted to the authenticated principal", () => {
+    const { repository, service } = fixture();
+    expect(() =>
+      service.previewTask(
+        { ...principal, allowedRoles: new Set(["builder"]) },
+        {
+          workspace_key: "echo-qcoder",
+          role: "commander",
+          mission: "escalate",
+          task: "edit files",
+        },
+      ),
+    ).toThrowError(/role/i);
+    expect(() =>
+      service.previewTask(
+        { ...principal, allowedWorkspaces: new Set(["other-workspace"]) },
+        {
+          workspace_key: "echo-qcoder",
+          role: "builder",
+          mission: "escape",
+          task: "edit files",
+        },
+      ),
+    ).toThrowError(/workspace/i);
     repository.close();
   });
 });

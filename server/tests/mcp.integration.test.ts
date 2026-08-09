@@ -37,6 +37,8 @@ function fixture(scopes = ["qcoder.sessions.read"]) {
     clientId: "test",
     scopes: new Set(scopes),
     expiresAt: 4_102_444_800,
+    allowedRoles: new Set(["*"]),
+    allowedWorkspaces: new Set(["*"]),
   });
   return { repository, service, verifier, webBundlePath };
 }

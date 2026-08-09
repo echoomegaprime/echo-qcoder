@@ -44,26 +44,30 @@ export function QCoderConsole() {
         body="Ask ChatGPT to retrieve and render a QCoder session."
       />
     );
-  return <QCoderConsoleInner app={app} sessionId={sessionId} />;
+  return <QCoderConsoleInner key={sessionId} app={app} sessionId={sessionId} />;
 }
 
 export function QCoderConsoleInner({ app, sessionId }: { app: ConsoleBridge; sessionId: string }) {
   const [state, dispatch] = useReducer(reduceConsoleState, initialConsoleState);
   const [task, setTask] = useState("");
+  const [confirmStop, setConfirmStop] = useState(false);
   const mounted = useRef(true);
+  const requestGeneration = useRef(0);
 
   const refresh = useCallback(async () => {
+    const generation = ++requestGeneration.current;
     dispatch({ type: "loading" });
     try {
       const result = await app.callServerTool({
         name: "get_qcoder_session",
         arguments: { session_id: sessionId, transcript_lines: 120 },
       });
-      if (!mounted.current) return;
+      if (!mounted.current || generation !== requestGeneration.current) return;
       const detail = parseSessionDetail(result);
+      if (detail.session.session_id !== sessionId) return;
       dispatch({ type: "loaded", ...detail });
     } catch (error) {
-      if (!mounted.current) return;
+      if (!mounted.current || generation !== requestGeneration.current) return;
       dispatch(
         isAuthenticationError(error)
           ? { type: "auth-required" }
@@ -78,6 +82,7 @@ export function QCoderConsoleInner({ app, sessionId }: { app: ConsoleBridge; ses
     const timer = window.setInterval(() => void refresh(), 5_000);
     return () => {
       mounted.current = false;
+      requestGeneration.current += 1;
       window.clearInterval(timer);
     };
   }, [refresh]);
@@ -123,6 +128,7 @@ export function QCoderConsoleInner({ app, sessionId }: { app: ConsoleBridge; ses
         },
       });
       if (result.isError) throw new Error(toolErrorMessage(result));
+      setConfirmStop(false);
       await refresh();
     } catch (error) {
       dispatch(
@@ -240,7 +246,7 @@ export function QCoderConsoleInner({ app, sessionId }: { app: ConsoleBridge; ses
           <button
             className="danger"
             type="button"
-            onClick={() => void stop()}
+            onClick={() => setConfirmStop(true)}
             disabled={terminal || state.writePending}
           >
             Stop session
@@ -250,6 +256,27 @@ export function QCoderConsoleInner({ app, sessionId }: { app: ConsoleBridge; ses
           </button>
         </div>
       </form>
+      {confirmStop ? (
+        <div
+          className="confirm-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirm QCoder stop"
+        >
+          <p>
+            Stop session <code>{state.session.session_id}</code> at revision{" "}
+            {state.session.revision}? Queued work will be cancelled.
+          </p>
+          <div className="actions">
+            <button type="button" onClick={() => setConfirmStop(false)}>
+              Keep running
+            </button>
+            <button className="danger" type="button" onClick={() => void stop()}>
+              Confirm stop
+            </button>
+          </div>
+        </div>
+      ) : null}
       <p className="sr-only" aria-live="assertive">
         {state.writePending ? "QCoder action in progress." : ""}
       </p>

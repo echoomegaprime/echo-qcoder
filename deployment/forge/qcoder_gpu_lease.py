@@ -269,9 +269,16 @@ class LeaseManager:
 
 
 class SystemPlatform:
-    def __init__(self, *, command_timeout: int = 45, health_timeout: int = 240) -> None:
+    def __init__(
+        self,
+        *,
+        command_timeout: int = 45,
+        health_timeout: int = 360,
+        ollama_restart_timeout: int = 180,
+    ) -> None:
         self.command_timeout = command_timeout
         self.health_timeout = health_timeout
+        self.ollama_restart_timeout = ollama_restart_timeout
 
     def assert_healthy(self) -> None:
         failures: list[str] = []
@@ -320,7 +327,10 @@ class SystemPlatform:
             raise PlatformError("GPU services did not stop: " + ", ".join(active))
 
     def clear_qwen(self) -> None:
-        self._run(["docker", "restart", "-t", "10", "echo-ollama"], timeout=60)
+        self._run(
+            ["docker", "restart", "-t", "10", "echo-ollama"],
+            timeout=self.ollama_restart_timeout,
+        )
         # Poll Ollama itself instead of Docker's coarse 30-second health
         # scheduler. The CLI becomes usable well before the next health tick.
         deadline = time.monotonic() + 75

@@ -1,0 +1,40 @@
+name: Verify QCoder Plugin
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        shell: pwsh
+        run: |
+          npm ci --ignore-scripts
+          npm ci --prefix scripts/inspector --ignore-scripts
+      - name: Verify plugin
+        shell: pwsh
+        run: ./scripts/verify-plugin.ps1 -SkipMcpSmoke
+      - name: Verify MCP protocol with Inspector
+        shell: pwsh
+        run: ./scripts/test-mcp.ps1 -SkipBuild -Inspector
+      - name: Package release artifact
+        shell: pwsh
+        run: ./scripts/package-plugin.ps1 -OutputDirectory ./artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: echo-qcoder-console
+          path: artifacts/*
+          if-no-files-found: error

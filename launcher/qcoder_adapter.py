@@ -110,12 +110,15 @@ def build_qwen_arguments(
     qwen_model: str = DEFAULT_MODEL,
     base_url: str = DEFAULT_BASE_URL,
     api_key: str = DEFAULT_API_KEY,
+    approval_mode: str = "yolo",
 ) -> list[str]:
     """Build explicit local-provider arguments without consulting user auth state."""
     if not base_url.startswith(("http://127.0.0.1:", "http://localhost:", "http://192.168.")):
         raise ValueError("qcoder base URL must be a local or private-network endpoint")
     if not qwen_model.strip():
         raise ValueError("qcoder model must not be empty")
+    if approval_mode not in {"auto-edit", "yolo"}:
+        raise ValueError("qcoder approval mode must be auto-edit or yolo")
 
     result = [
         "--model",
@@ -127,7 +130,7 @@ def build_qwen_arguments(
         "--openai-api-key",
         api_key,
         "--approval-mode",
-        "yolo",
+        approval_mode,
         "--output-format",
         "text",
     ]
@@ -140,14 +143,17 @@ def build_qwen_arguments(
         result.extend(["--resume", invocation.resume_session])
     if invocation.mode == "headless":
         result.append("-p")
+    else:
+        # A positional query is one-shot in current Qwen Code releases. The
+        # governed bootstrap must seed the session and then leave the TUI open.
+        result.append("--prompt-interactive")
     result.append(invocation.prompt)
     return result
 
 
 def apply_target_workspace(invocation: CodexInvocation, target_workspace: str) -> CodexInvocation:
     target = Path(target_workspace)
-    include_directories = tuple(dict.fromkeys((*invocation.include_directories, target)))
-    return invocation._replace(workspace=target, include_directories=include_directories)
+    return invocation._replace(workspace=target, include_directories=())
 
 
 def safe_invocation_summary(
@@ -189,12 +195,47 @@ def resolve_qwen_executable() -> str:
 
 
 def build_qwen_environment(
-    base_environment: dict[str, str], *, settings_path: Path
+    base_environment: dict[str, str], *, settings_path: Path, plugin_mode: bool = False
 ) -> dict[str, str]:
-    environment = dict(base_environment)
+    if plugin_mode:
+        allowed = {
+            "APPDATA",
+            "COMPUTERNAME",
+            "COMSPEC",
+            "HOMEDRIVE",
+            "HOMEPATH",
+            "LOCALAPPDATA",
+            "NUMBER_OF_PROCESSORS",
+            "OS",
+            "PATH",
+            "PATHEXT",
+            "PROCESSOR_ARCHITECTURE",
+            "PROGRAMDATA",
+            "PROGRAMFILES",
+            "PROGRAMFILES(X86)",
+            "SYSTEMDRIVE",
+            "SYSTEMROOT",
+            "TEMP",
+            "TMP",
+            "USERDOMAIN",
+            "USERNAME",
+            "USERPROFILE",
+            "WINDIR",
+        }
+        environment = {
+            key: value
+            for key, value in base_environment.items()
+            if key.upper() in allowed
+        }
+    else:
+        environment = dict(base_environment)
     environment["QWEN_CODE_SYSTEM_SETTINGS_PATH"] = str(settings_path)
     environment.setdefault("QWEN_CODE_API_TIMEOUT_MS", "900000")
     environment.pop("OPENAI_API_KEY", None)
+    for key in tuple(environment):
+        normalized = key.upper()
+        if any(marker in normalized for marker in ("TOKEN", "SECRET", "PASSWORD", "CREDENTIAL", "COOKIE")):
+            environment.pop(key, None)
     return environment
 
 
@@ -311,15 +352,21 @@ def main(arguments: Sequence[str] | None = None) -> int:
     model = os.environ.get("QCODER_MODEL", DEFAULT_MODEL)
     base_url = os.environ.get("QCODER_BASE_URL", DEFAULT_BASE_URL)
     api_key = os.environ.get("QCODER_LOCAL_API_KEY", DEFAULT_API_KEY)
+    plugin_mode = os.environ.get("QCODER_PLUGIN_MODE") == "1"
     qwen_arguments = build_qwen_arguments(
         invocation,
         qwen_model=model,
         base_url=base_url,
         api_key=api_key,
+        approval_mode="auto-edit" if plugin_mode else "yolo",
     )
 
-    settings_path = Path(__file__).with_name("qwen-settings.json")
-    environment = build_qwen_environment(dict(os.environ), settings_path=settings_path)
+    settings_path = Path(__file__).with_name(
+        "qwen-plugin-settings.json" if plugin_mode else "qwen-settings.json"
+    )
+    environment = build_qwen_environment(
+        dict(os.environ), settings_path=settings_path, plugin_mode=plugin_mode
+    )
     print(f"QCoder launching {safe_invocation_summary(invocation, qwen_model=model, base_url=base_url)}")
     return run_supervised_process(
         [executable, *qwen_arguments],

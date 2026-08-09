@@ -10,6 +10,7 @@ export interface IntrospectionConfig {
   issuer: string;
   allowedTenant: string;
   timeoutMs: number;
+  allowedClientIds: ReadonlySet<string>;
 }
 
 interface IntrospectionPayload {
@@ -21,6 +22,8 @@ interface IntrospectionPayload {
   iss?: string;
   client_id?: string;
   exp?: number;
+  qcoder_roles?: unknown;
+  qcoder_workspaces?: unknown;
 }
 
 interface CachedPrincipal {
@@ -30,6 +33,18 @@ interface CachedPrincipal {
 
 function exactAudience(aud: string | string[] | undefined, resource: string): boolean {
   return typeof aud === "string" ? aud === resource : Array.isArray(aud) && aud.includes(resource);
+}
+
+function stringSet(value: unknown, label: string): ReadonlySet<string> {
+  if (
+    !Array.isArray(value) ||
+    value.length === 0 ||
+    value.length > 64 ||
+    value.some((item) => typeof item !== "string" || !/^[a-z0-9][a-z0-9._-]{0,63}$/u.test(item))
+  ) {
+    throw new AppError("AUTH_INVALID", `The QCoder token has invalid ${label} entitlements.`, 401);
+  }
+  return new Set(value);
 }
 
 export class OAuthIntrospectionVerifier implements TokenVerifier {
@@ -42,6 +57,9 @@ export class OAuthIntrospectionVerifier implements TokenVerifier {
     }
     if (!config.clientId || !config.clientSecret || !config.resource || !config.allowedTenant) {
       throw new AppError("INVALID_INPUT", "OAuth introspection configuration is incomplete.");
+    }
+    if (config.allowedClientIds.size === 0) {
+      throw new AppError("INVALID_INPUT", "At least one OAuth client ID must be allowlisted.");
     }
     this.#config = config;
   }
@@ -80,6 +98,15 @@ export class OAuthIntrospectionVerifier implements TokenVerifier {
         403,
       );
     }
+    if (!payload.client_id || !this.#config.allowedClientIds.has(payload.client_id)) {
+      throw new AppError(
+        "AUTH_INVALID",
+        "The QCoder token was issued to an unapproved client.",
+        401,
+      );
+    }
+    const allowedRoles = stringSet(payload.qcoder_roles, "role");
+    const allowedWorkspaces = stringSet(payload.qcoder_workspaces, "workspace");
     const scopes = new Set((payload.scope ?? "").split(/\s+/u).filter(Boolean));
     if (!scopes.has(requiredScope)) {
       throw new AppError(
@@ -94,6 +121,8 @@ export class OAuthIntrospectionVerifier implements TokenVerifier {
       clientId: payload.client_id ?? null,
       scopes,
       expiresAt: payload.exp,
+      allowedRoles,
+      allowedWorkspaces,
     };
     this.#cache.set(tokenHash, { principal, checkedAt: Date.now() });
     if (this.#cache.size > 512) this.#cache.delete(this.#cache.keys().next().value ?? "");

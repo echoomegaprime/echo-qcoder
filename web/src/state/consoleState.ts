@@ -49,7 +49,11 @@ export function reduceConsoleState(state: ConsoleState, action: ConsoleAction): 
     case "revision":
       return action.revision > state.revision ? { ...state, revision: action.revision } : state;
     case "loaded":
-      if (action.session.revision < state.revision) return state;
+      if (
+        state.session?.session_id === action.session.session_id &&
+        action.session.revision < state.revision
+      )
+        return state;
       return {
         ...state,
         phase: "ready",

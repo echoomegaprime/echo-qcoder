@@ -10,10 +10,8 @@ $allowedParent = [IO.Path]::GetFullPath((Join-Path $marketRoot 'plugins'))
 if ($resolvedParent -ne $allowedParent) { throw 'Marketplace target escaped the controlled staging directory.' }
 if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }
 New-Item -ItemType Directory -Path $target -Force | Out-Null
-$excluded = @('.git','node_modules','.runtime','artifacts','.agents')
-Get-ChildItem -LiteralPath $root -Force | Where-Object { $_.Name -notin $excluded } | ForEach-Object {
-    Copy-Item -LiteralPath $_.FullName -Destination $target -Recurse -Force
-}
+& (Join-Path $PSScriptRoot 'stage-plugin.ps1') -Destination $target
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & node (Join-Path $target 'scripts\validate-plugin.mjs')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 if ($Register) {

@@ -18,18 +18,20 @@ function runtime(stdio: boolean) {
   const config = loadConfig(!stdio);
   mkdirSync(config.dataDirectory, { recursive: true });
   const repository = new SessionRepository(join(config.dataDirectory, "sessions.sqlite3"));
+  const runner = new QCoderProcessRunner({
+    powershellPath: config.powershellPath,
+    launcherPath: config.launcherPath,
+    leaseReleaseCommand: "ssh",
+  });
   const service = new QCoderSessionService({
     repository,
     workspaces: new WorkspaceRegistry(config.workspaces),
     transcripts: new TranscriptStore(join(config.dataDirectory, "transcripts")),
-    runner: new QCoderProcessRunner({
-      powershellPath: config.powershellPath,
-      launcherPath: config.launcherPath,
-      leaseReleaseCommand: "ssh",
-    }),
+    runner,
     previewSecret: config.previewSecret,
   });
-  return { config, repository, service };
+  service.resume();
+  return { config, repository, runner, service };
 }
 
 async function main(): Promise<void> {
@@ -50,6 +52,8 @@ async function main(): Promise<void> {
         "qcoder.sessions.stop",
       ]),
       expiresAt: 4_102_444_800,
+      allowedRoles: new Set(["*"]),
+      allowedWorkspaces: new Set(["*"]),
     });
     await createQCoderMcpServer({
       bearerToken: "local-os-user",
@@ -62,7 +66,10 @@ async function main(): Promise<void> {
   }
   if (process.env.QCODER_LOCAL_DEV_AUTH === "1") {
     // Local-only smoke/dev. Never enable in production or public edge.
-    if (process.env.NODE_ENV === "production" && process.env.QCODER_ALLOW_LOCAL_AUTH_IN_PROD !== "1") {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.QCODER_ALLOW_LOCAL_AUTH_IN_PROD !== "1"
+    ) {
       throw new Error("QCODER_LOCAL_DEV_AUTH is not allowed in production.");
     }
     verifier = new StaticPrincipalVerifier({
@@ -76,6 +83,8 @@ async function main(): Promise<void> {
         "qcoder.sessions.stop",
       ]),
       expiresAt: 4_102_444_800,
+      allowedRoles: new Set(["*"]),
+      allowedWorkspaces: new Set(["*"]),
     });
   } else {
     verifier = new OAuthIntrospectionVerifier({
@@ -86,6 +95,7 @@ async function main(): Promise<void> {
       issuer: state.config.oauth.issuer,
       allowedTenant: state.config.oauth.tenant,
       timeoutMs: 5_000,
+      allowedClientIds: state.config.oauth.allowedClientIds,
     });
   }
   const app = createHttpApp({
@@ -102,8 +112,10 @@ async function main(): Promise<void> {
   );
   const shutdown = (): void => {
     server.close(() => {
-      state.repository.close();
-      process.exit(0);
+      void state.runner.stopAll().finally(() => {
+        state.repository.close();
+        process.exit(0);
+      });
     });
   };
   process.on("SIGINT", shutdown);
@@ -116,4 +128,3 @@ main().catch((error: unknown) => {
   });
   process.exitCode = 1;
 });
-

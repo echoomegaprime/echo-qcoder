@@ -1,37 +1,28 @@
-﻿
-# BUILD_REPORT
+# Build report
 
-Generated: 2026-08-09T16:40:00Z
+Generated 2026-08-09.
 
-## Location
-C:\ECHO_MCP\echo-qcoder (isolated from Echo Nexus sandbox app)
+## Result
 
-## Deliverables
-1. Skill: skills/qcoder-session-operator
-2. Streamable HTTP MCP server /mcp
-3. MCP Apps UI ui://qcoder/console/v1
-4. OAuth-scoped tools (exactly 7)
-5. .codex-plugin/plugin.json + .mcp.json
-6. NO .app.json (awaiting plugin_asdk_app id)
-7. PowerShell scripts: package/verify/install/configure/test
-8. Local marketplace .agents/plugins/marketplace.json
-9. Docs + 60 golden prompts + package SHA-256
+Built QCoder as a governed local Qwen Code builder plus a private full-bundle ChatGPT/Codex plugin. The runtime uses the verified FORGE-hosted 27B abliterated model across two GPUs and retains CPU-offload capacity. The plugin supplies one focused skill, seven user-goal MCP tools, a versioned MCP Apps console, OAuth authorization contracts, local marketplace support, deterministic PowerShell automation, CI, tests, and release documentation.
 
-## Evidence
-- typecheck PASS
-- server tests 27/27 PASS
-- web tests 5/5 PASS
-- golden 60 PASS accuracy 1.0
-- build PASS
-- validate-plugin tools=7 PASS
-- local MCP smoke 127.0.0.1:18788 PASS tools=7 UI resource OK
-- package artifacts/echo-qcoder-console-0.1.0.zip
-- sha256 767ce96eea70b24c0af6684f67a22f1593a27afe757ed5efa7f023c838e568f0
+## Security hardening
 
-## BLOCKED BY EXTERNAL DEPENDENCY
-Production resource https://mcp.echo-op.com/oauth-mcp-qcoder-v1 returns 404.
-Introspection client registration not provisioned.
+Remote sessions are limited to registered workspace keys and entitled roles. The HTTP boundary validates exact resource audience, issuer, expiry, scopes, tenant, client ID, roles, and workspaces. Qwen runs in plugin `auto-edit` mode with shell/web/sub-agent tools denied and a minimal environment. Outputs are bounded/redacted; actions are idempotent and quota-limited; restart recovery and stop verify process-tree and lease cleanup.
 
-## Not claimed
-ChatGPT host OAuth link, public submission, production deploy.
+## Verification summary
 
+- Server: 34 tests passed.
+- Web: 7 tests passed.
+- Launcher: 15 tests passed.
+- Golden metadata prompts: 60/60 passed.
+- Typecheck, lint, format, build, manifest validation, dependency audits, secret scan, MCP smoke, and MCP Inspector passed.
+- Release package is generated under `artifacts/` with a JSON SHA-256 sidecar.
+
+## External boundaries
+
+The stable production resource `https://mcp.echo-op.com/oauth-mcp-qcoder-v1`, OAuth client/claims mapping, production retention reaper, ChatGPT Scan Tools result, and real `plugin_asdk_app...` identifier do not yet exist. `.app.json` is intentionally absent. Public submission is not the target.
+
+## Repository
+
+Path: `C:\ECHO_MCP\echo-qcoder`. Remote: `https://github.com/ECHO-OMEGA-PRIME/echo-qcoder`. Unrelated ECHO worktree changes were not touched.

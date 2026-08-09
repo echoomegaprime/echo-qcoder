@@ -232,6 +232,17 @@ h1 {
   white-space: nowrap;
   border: 0;
 }
+
+.confirm-panel {
+  border: 1px solid color-mix(in srgb, var(--danger) 55%, transparent);
+  background: color-mix(in srgb, var(--surface) 92%, var(--danger));
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.confirm-panel code {
+  overflow-wrap: anywhere;
+}
 @media (max-width: 620px) {
   .facts {
     grid-template-columns: repeat(2, 1fr);

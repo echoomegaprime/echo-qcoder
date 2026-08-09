@@ -19,6 +19,7 @@ export interface ServerConfig {
     issuer: string;
     tenant: string;
     protectedResourceMetadataUrl: string;
+    allowedClientIds: ReadonlySet<string>;
   };
   previewSecret: Buffer;
 }
@@ -97,8 +98,16 @@ export function loadConfig(requireOAuthCredentials = true): ServerConfig {
       protectedResourceMetadataUrl:
         process.env.QCODER_OAUTH_METADATA_URL ??
         "https://mcp.echo-op.com/.well-known/oauth-protected-resource/oauth-mcp-qcoder-v1",
+      allowedClientIds: new Set(
+        (requireOAuthCredentials
+          ? required("QCODER_OAUTH_ALLOWED_CLIENT_IDS")
+          : (process.env.QCODER_OAUTH_ALLOWED_CLIENT_IDS ?? "qcoder-local-dev,codex-local-plugin")
+        )
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+      ),
     },
     previewSecret: loadOrCreateSecret(resolve(dataDirectory, "preview-secret")),
   };
 }
-

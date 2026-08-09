@@ -78,4 +78,25 @@ describe("QCoder MCP App", () => {
       await screen.findByRole("heading", { name: "Authorization required" }),
     ).toBeInTheDocument();
   });
+
+  it("requires a second session-bound confirmation before stopping", async () => {
+    const callServerTool = vi.fn().mockResolvedValue(detail());
+    const app = { callServerTool, sendMessage: vi.fn() } as unknown as ConsoleBridge;
+    render(<QCoderConsoleInner app={app} sessionId={sessionId} />);
+    await screen.findByRole("heading", { name: "QCoder Console" });
+    fireEvent.click(screen.getByRole("button", { name: "Stop session" }));
+    expect(screen.getByRole("dialog", { name: "Confirm QCoder stop" })).toBeInTheDocument();
+    expect(
+      callServerTool.mock.calls.some(
+        (arguments_) =>
+          (arguments_[0] as { name?: string } | undefined)?.name === "stop_qcoder_session",
+      ),
+    ).toBe(false);
+    fireEvent.click(screen.getByRole("button", { name: "Confirm stop" }));
+    await waitFor(() =>
+      expect(callServerTool).toHaveBeenCalledWith(
+        expect.objectContaining({ name: "stop_qcoder_session" }),
+      ),
+    );
+  });
 });

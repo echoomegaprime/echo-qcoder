@@ -9,7 +9,11 @@ import type {
 } from "../persistence/sessionRepository.js";
 import type { FleetRole, SessionSummary, TaskSummary } from "../schemas/tools.js";
 import type { ManagedTaskRunner } from "./taskRunner.js";
-import type { TranscriptEntry, TranscriptStore } from "./transcriptStore.js";
+import {
+  redactTranscriptText,
+  type TranscriptEntry,
+  type TranscriptStore,
+} from "./transcriptStore.js";
 import type { WorkspaceRegistry } from "./workspaceRegistry.js";
 
 interface PreviewInput {
@@ -94,10 +98,25 @@ export class QCoderSessionService {
     this.#previewSecret = dependencies.previewSecret;
   }
 
+  resume(): void {
+    this.#repository.recoverInterruptedRuns();
+    this.#dispatch();
+  }
+
   previewTask(principal: AuthPrincipal, input: PreviewInput): PreviewResult {
+    this.#authorizeTarget(principal, input.workspace_key, input.role);
     this.#workspaces.resolve(input.workspace_key);
     const fingerprint = createHmac("sha256", this.#previewSecret)
-      .update(previewPayload(input, principal.subject, principal.tenant))
+      .update(
+        JSON.stringify({
+          payload: previewPayload(input, principal.subject, principal.tenant),
+          client_id: principal.clientId,
+          roles: [...principal.allowedRoles].sort(),
+          workspaces: [...principal.allowedWorkspaces].sort(),
+          authorization_expires_at: principal.expiresAt,
+          policy_revision: 2,
+        }),
+      )
       .digest("hex");
     return {
       accepted: true,
@@ -200,6 +219,8 @@ export class QCoderSessionService {
   ): Promise<{ session: SessionSummary; task: TaskSummary; duplicate: boolean }> {
     // Establish the asynchronous tool boundary before persistence can reject.
     await Promise.resolve();
+    const owned = this.#ownedSession(principal, input.session_id);
+    this.#authorizeTarget(principal, owned.workspaceKey, owned.role);
     const result = this.#repository.enqueueTask({
       sessionId: input.session_id,
       subject: principal.subject,
@@ -238,10 +259,17 @@ export class QCoderSessionService {
       correlationId: randomUUID(),
       subjectHash: subjectHash(principal.subject),
     });
-    if (!stopped.duplicate) {
-      this.#transcripts.append(input.session_id, "system", `Stop requested: ${input.reason}`);
-      if (await this.#runner.stop(input.session_id))
-        this.#repository.markSessionStopped(input.session_id);
+    this.#appendTranscript(input.session_id, "system", `Stop requested: ${input.reason}`);
+    if (stopped.session.status === "stopping") {
+      if (!(await this.#runner.stop(input.session_id))) {
+        throw new AppError(
+          "UNAVAILABLE",
+          "QCoder process termination is not yet verified.",
+          503,
+          true,
+        );
+      }
+      this.#repository.markSessionStopped(input.session_id);
     }
     const current = this.#sessionSummary(this.#ownedSession(principal, input.session_id));
     if (current.status !== "stopping" && current.status !== "stopped") {
@@ -260,6 +288,31 @@ export class QCoderSessionService {
     const session = this.#repository.getSession(sessionId, principal.subject, principal.tenant);
     if (!session) throw new AppError("NOT_FOUND", "That QCoder session was not found.", 404);
     return session;
+  }
+
+  #authorizeTarget(principal: AuthPrincipal, workspaceKey: string, role: FleetRole): void {
+    if (!principal.allowedWorkspaces.has("*") && !principal.allowedWorkspaces.has(workspaceKey)) {
+      throw new AppError(
+        "WORKSPACE_FORBIDDEN",
+        "This connection is not entitled to that workspace.",
+        403,
+      );
+    }
+    if (!principal.allowedRoles.has("*") && !principal.allowedRoles.has(role)) {
+      throw new AppError(
+        "ROLE_FORBIDDEN",
+        "This connection is not entitled to that fleet role.",
+        403,
+      );
+    }
+  }
+
+  #appendTranscript(sessionId: string, stream: TranscriptEntry["stream"], text: string): void {
+    try {
+      this.#transcripts.append(sessionId, stream, text);
+    } catch {
+      // Evidence retention must never prevent process termination or state recovery.
+    }
   }
 
   #sessionSummary(session: SessionRecord): SessionSummary {
@@ -296,7 +349,7 @@ export class QCoderSessionService {
     if (!next) return;
     this.#dispatching = true;
     this.#repository.markTaskRunning(next.session.sessionId, next.task.taskId);
-    this.#transcripts.append(next.session.sessionId, "system", `Task ${next.task.taskId} started.`);
+    this.#appendTranscript(next.session.sessionId, "system", `Task ${next.task.taskId} started.`);
     const workspacePath = this.#workspaces.resolve(next.session.workspaceKey);
     void this.#runner
       .run({
@@ -306,7 +359,7 @@ export class QCoderSessionService {
         role: next.session.role,
         mission: next.session.mission,
         task: next.task.taskText,
-        onOutput: (stream, text) => this.#transcripts.append(next.session.sessionId, stream, text),
+        onOutput: (stream, text) => this.#appendTranscript(next.session.sessionId, stream, text),
       })
       .then((result) => {
         this.#repository.markTaskFinished(
@@ -318,8 +371,10 @@ export class QCoderSessionService {
         );
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : "QCoder launch failed.";
-        this.#transcripts.append(next.session.sessionId, "stderr", message);
+        const message = redactTranscriptText(
+          error instanceof Error ? error.message : "QCoder launch failed.",
+        );
+        this.#appendTranscript(next.session.sessionId, "stderr", message);
         this.#repository.markTaskFinished(
           next.session.sessionId,
           next.task.taskId,

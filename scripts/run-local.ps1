@@ -23,7 +23,7 @@ if ($Mode -eq 'stdio') {
     exit $LASTEXITCODE
 }
 
-$required = 'QCODER_OAUTH_INTROSPECTION_URL','QCODER_OAUTH_CLIENT_ID','QCODER_OAUTH_CLIENT_SECRET'
+$required = 'QCODER_OAUTH_INTROSPECTION_URL','QCODER_OAUTH_CLIENT_ID','QCODER_OAUTH_CLIENT_SECRET','QCODER_OAUTH_ALLOWED_CLIENT_IDS'
 $missing = @($required | Where-Object { -not [Environment]::GetEnvironmentVariable($_) })
 if ($missing.Count -gt 0) { throw "Missing HTTP-mode environment variables: $($missing -join ', ')" }
 $hostName = if ($env:HOST) { $env:HOST } else { '127.0.0.1' }

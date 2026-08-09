@@ -188,6 +188,12 @@ class SystemPlatformMaskTests(unittest.TestCase):
         self.assertLess(guard_index, stop_index)
         self.assertFalse(any(command[1:2] == ["mask"] for command in self.platform.commands))
 
+    def test_default_timeouts_cover_large_model_unload_and_cold_restore(self) -> None:
+        platform = self.module.SystemPlatform()
+
+        self.assertEqual(platform.ollama_restart_timeout, 180)
+        self.assertEqual(platform.health_timeout, 360)
+
     def test_resume_removes_restart_guard_before_starting_services(self) -> None:
         original_state = {service: True for service in self.module.SERVICES}
         for service in self.module.SERVICES:

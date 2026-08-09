@@ -251,6 +251,8 @@ export class SessionRepository {
       }
       return { session, task, duplicate: true };
     }
+    this.#enforceActionRate(input.subject, input.tenant, "start", 6);
+    this.#enforceGlobalQueueLimit();
 
     const sessionId = identifier("qcs");
     const taskId = identifier("qct");
@@ -366,6 +368,42 @@ export class SessionRepository {
     return { running: running.count, queued: queued.count };
   }
 
+  recoverInterruptedRuns(): number {
+    const now = new Date().toISOString();
+    this.#database.exec("BEGIN IMMEDIATE");
+    try {
+      const tasks = this.#database
+        .prepare(
+          `UPDATE tasks SET status = 'failed', finished_at = ?, outcome = ?
+           WHERE status = 'running'`,
+        )
+        .run(now, "Interrupted by QCoder service restart.");
+      this.#database
+        .prepare(
+          `UPDATE sessions
+           SET status = CASE
+             WHEN status = 'stopping' THEN 'stopped'
+             WHEN EXISTS (
+               SELECT 1 FROM tasks WHERE tasks.session_id = sessions.session_id
+               AND tasks.status = 'queued'
+             ) THEN 'queued'
+             ELSE 'failed'
+           END,
+           active_task_id = NULL,
+           last_outcome = 'Recovered after QCoder service restart.',
+           revision = revision + 1,
+           updated_at = ?
+           WHERE status IN ('running', 'stopping')`,
+        )
+        .run(now);
+      this.#database.exec("COMMIT");
+      return Number(tasks.changes);
+    } catch (error) {
+      this.#database.exec("ROLLBACK");
+      throw error;
+    }
+  }
+
   enqueueTask(input: EnqueueTaskInput): EnqueueTaskResult {
     const prior = this.#idempotency(input.subject, input.tenant, "send", input.idempotencyKey);
     if (prior) {
@@ -382,6 +420,8 @@ export class SessionRepository {
         throw new AppError("UNAVAILABLE", "The prior QCoder task record is incomplete.", 503, true);
       return { session, task, duplicate: true };
     }
+    this.#enforceActionRate(input.subject, input.tenant, "send", 30);
+    this.#enforceGlobalQueueLimit();
     const session = this.getSession(input.sessionId, input.subject, input.tenant);
     if (!session) throw new AppError("NOT_FOUND", "That QCoder session was not found.", 404);
     if (session.revision !== input.expectedRevision) {
@@ -533,6 +573,7 @@ export class SessionRepository {
         throw new AppError("UNAVAILABLE", "The prior stop record is incomplete.", 503, true);
       return { session, auditId: prior.task_id, duplicate: true };
     }
+    this.#enforceActionRate(input.subject, input.tenant, "stop", 12);
     const session = this.getSession(input.sessionId, input.subject, input.tenant);
     if (!session) throw new AppError("NOT_FOUND", "That QCoder session was not found.", 404);
     if (session.revision !== input.expectedRevision) {
@@ -541,6 +582,9 @@ export class SessionRepository {
         "The QCoder session changed; refresh it before stopping.",
         409,
       );
+    }
+    if (["completed", "failed", "stopped"].includes(session.status)) {
+      throw new AppError("CONFLICT", "That QCoder session is already terminal.", 409);
     }
     const auditId = identifier("qca");
     const now = new Date().toISOString();
@@ -644,5 +688,30 @@ export class SessionRepository {
          WHERE subject = ? AND tenant = ? AND action = ? AND idempotency_key = ?`,
       )
       .get(subject, tenant, action, key) as IdempotencyRow | undefined;
+  }
+
+  #enforceActionRate(subject: string, tenant: string, action: string, limit: number): void {
+    const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const row = this.#database
+      .prepare(
+        `SELECT count(*) AS count FROM idempotency
+         WHERE subject = ? AND tenant = ? AND action = ? AND created_at >= ?`,
+      )
+      .get(subject, tenant, action, cutoff) as unknown as CountRow;
+    if (row.count >= limit) {
+      throw new AppError(
+        "RATE_LIMITED",
+        `The hourly QCoder ${action} limit has been reached.`,
+        429,
+        true,
+      );
+    }
+  }
+
+  #enforceGlobalQueueLimit(): void {
+    const counts = this.queueCounts();
+    if (counts.running + counts.queued >= 50) {
+      throw new AppError("RATE_LIMITED", "The global QCoder queue is full.", 429, true);
+    }
   }
 }
