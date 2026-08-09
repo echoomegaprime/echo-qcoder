@@ -70,6 +70,14 @@ node .\scripts\autonomy-tick.mjs --output .\artifacts\qcoder-autonomy-report.jso
 
 The tick proposes and reports drift; it never auto-merges code, grants new authority, or weakens a security boundary.
 
+HAMMER also carries the same six-hour gate as a limited, non-overlapping Windows Scheduled Task. This remains operational when hosted GitHub Actions cannot allocate a runner:
+
+```powershell
+pwsh -File .\scripts\install-autonomy-task.ps1 -StartNow
+```
+
+The task runs `scripts/run-autonomy-tick.ps1`, keeps the sanitized report under `.runtime`, and reconciles the same single GitHub issue through the authenticated `gh` CLI.
+
 For local HTTP development, configure the four OAuth variables shown in `.env.example`, then run `pwsh -File .\scripts\run-local.ps1`. For trusted stdio, use `pwsh -File .\scripts\run-local.ps1 -Mode stdio`.
 
 ## ChatGPT connection

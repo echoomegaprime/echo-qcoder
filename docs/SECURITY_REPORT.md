@@ -20,6 +20,7 @@ Additional fixes include per-action and global quotas, request-size limits, serv
 - Promptfoo 0.122.0 was removed after its installed tree reported six high and three moderate npm advisories. The remaining local powerpack audit reports zero vulnerabilities.
 - Serena is untrusted and constrained to an explicit semantic/refactor tool allowlist; shell, raw file, and memory tools are excluded from Qwen's profile.
 - Public-source hardening removed generated Python bytecode from Git tracking while preserving local runtime files. The six-hour workflow has only read-content and issue-write permissions; it cannot push, merge, release, deploy, or read repository secrets.
+- The HAMMER fallback task runs with the current interactive identity at `RunLevel Limited`, ignores overlapping runs, has a 30-minute execution limit, stores only sanitized local evidence, and posts only failed gate names to the public issue.
 
 The managed deep security scanner was **BLOCKED BY EXTERNAL DEPENDENCY** after three attempts because its host did not expose the required filesystem permission profile. This is recorded as blocked, not passed; targeted manual review and automated security tests completed.
 

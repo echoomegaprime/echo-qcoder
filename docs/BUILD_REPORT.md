@@ -10,7 +10,7 @@ The 0.3.0 capability powerpack pins 21 permissively licensed upstream repositori
 
 The original 8K Ollama tag could not fit Qwen 0.21.8's initialized agent, skill, and tool contract. A separate, reproducible `c3po-code:qcoder-32k` tag now preserves the source model while providing a 32,768-token operational context. A live headless adapter response returned the exact expected text, used 27,270 total tokens without truncation, and reported the full 18.64 GB model resident in VRAM; both 16 GB GPUs showed active allocation.
 
-Continuous maintenance is now real rather than aspirational: a fail-closed autonomy tick runs every six hours, reconciles one persistent GitHub issue on failures/recovery, and is paired with weekly Dependabot checks. The same tick passed locally with all four gates green.
+Continuous maintenance is now real rather than aspirational: a fail-closed autonomy tick is defined every six hours, reconciles one persistent GitHub issue on failures/recovery, and is paired with weekly Dependabot checks. GitHub accepted a manual dispatch but refused to allocate any hosted runner because the account is locked by a billing issue. A limited HAMMER Scheduled Task now runs the identical gate every six hours; its immediate execution completed with result `0`, all four gates green, and the next repetition interval verified as `PT6H`.
 
 Echo Desktop now includes a truthful zero-cost `qcoder` provider bound to the exact local model and FORGE OpenAI-compatible route. Its source configuration, bridge routing, typecheck, build, governance tests, and a live bridge-to-model response were verified; a full packaged Desktop host certification was not claimed from the dirty Desktop checkout.
 
@@ -30,12 +30,13 @@ Remote sessions are limited to registered workspace keys and entitled roles. The
 - Serena: direct MCP initialization and a real Python symbol overview passed; Qwen Code reported the server connected after cold initialization.
 - Qwen Code: installed executable reported 0.21.8; 32K headless adapter smoke returned `QCODER_ADAPTER_32K_OK`.
 - Scheduled autonomy: local four-gate execution returned `QCODER_AUTONOMY_TICK_OK`.
+- HAMMER scheduler: `ECHO QCoder Autonomy Tick` is enabled, limited, non-overlapping, and its first run returned `0`.
 - Echo Desktop bridge: live `qcoder` call returned `ECHO_DESKTOP_QCODER_OK` exactly.
 - Release package: `artifacts/echo-qcoder-console-0.3.0.zip` with its generated SHA-256 sidecar as the non-circular source of truth. The archive includes the powerpack, model-provisioning, and Serena contracts and excludes unrelated untracked files.
 
 ## External boundaries
 
-The stable production resource `https://mcp.echo-op.com/oauth-mcp-qcoder-v1`, OAuth client/claims mapping, production retention reaper, ChatGPT Scan Tools result, and real `plugin_asdk_app...` identifier do not yet exist. `.app.json` is intentionally absent. Public source distribution is complete; public ChatGPT-directory submission is not the target.
+The stable production resource `https://mcp.echo-op.com/oauth-mcp-qcoder-v1`, OAuth client/claims mapping, production retention reaper, ChatGPT Scan Tools result, and real `plugin_asdk_app...` identifier do not yet exist. `.app.json` is intentionally absent. GitHub-hosted jobs are account-blocked before runner allocation by a billing lock; the verified local schedule is the active recurrence. Public source distribution is complete; public ChatGPT-directory submission is not the target.
 
 ## Repository
 

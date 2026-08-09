@@ -52,3 +52,16 @@ test("scheduled workflow reconciles one persistent autonomy issue", () => {
   assert.match(dependabot, /package-ecosystem: "npm"/u);
   assert.match(dependabot, /package-ecosystem: "github-actions"/u);
 });
+
+test("HAMMER fallback installs a six-hour bounded task with issue reconciliation", () => {
+  const installer = readFileSync(resolve(root, "scripts/install-autonomy-task.ps1"), "utf8");
+  const runner = readFileSync(resolve(root, "scripts/run-autonomy-tick.ps1"), "utf8");
+  assert.match(installer, /New-TimeSpan -Hours 6/u);
+  assert.match(installer, /MultipleInstances IgnoreNew/u);
+  assert.match(installer, /RunLevel Limited/u);
+  assert.match(installer, /run-autonomy-tick\.ps1/u);
+  assert.match(runner, /autonomy-tick\.mjs/u);
+  assert.match(runner, /issue list --repo/u);
+  assert.match(runner, /issue create --repo/u);
+  assert.match(runner, /QCoder autonomy tick needs attention/u);
+});

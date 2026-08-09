@@ -7,6 +7,7 @@
 - Fixed headless Qwen 0.21.8 output by reducing `stream-json` to visible assistant text while suppressing hidden reasoning and initialization payloads.
 - Expanded the supply-chain manifest from 14 to 21 permissively licensed repositories, adding Qwen Code, Qwen-Agent, Playwright MCP, Spec Kit, MarkItDown, PR-Agent, and Superpowers patterns.
 - Added a six-hour GitHub autonomy tick, persistent failure-issue reconciliation, weekly Dependabot coverage, and public-source hardening.
+- Added and activated a six-hour limited HAMMER Scheduled Task fallback after the GitHub account billing lock prevented hosted jobs from receiving a runner.
 - Stopped tracking generated Python bytecode while preserving the live local files.
 
 ## 0.2.0 - 2026-08-09

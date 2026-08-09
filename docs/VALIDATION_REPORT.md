@@ -12,9 +12,10 @@ Checked 2026-08-09. Evidence is from real commands; skipped checks are not count
 | 3     | UI automated tests                              | PASS                           | 7/7                                                                            |
 | 3     | Python launcher tests                           | PASS                           | 17/17                                                                          |
 | 3     | Qwen-native skill contracts                     | PASS                           | 8/8 manifests validated, installed, and source-hash checked                    |
-| 3     | Powerpack/autonomy contracts                    | PASS                           | 14/14 tests; installer rerun completed idempotently                            |
+| 3     | Powerpack/autonomy contracts                    | PASS                           | 15/15 tests; installer rerun completed idempotently                            |
 | 3     | Upstream commit/license verification            | PASS                           | 21/21 exact repository HEADs and license SHA-256 values revalidated online     |
 | 3     | Golden prompt regression                        | PASS                           | 60/60, zero unsafe activations                                                 |
+| 3     | Six-hour HAMMER autonomy task                   | PASS                           | Enabled `PT6H`; immediate run completed with Task Scheduler result `0`         |
 | 4     | Local MCP initialize/list/call/resource         | PASS                           | Streamable HTTP smoke returns seven tools and the UI resource                  |
 | 4     | MCP Inspector                                   | PASS                           | Inspector 2.1.0 `tools/list` completed against local Streamable HTTP           |
 | 4     | Serena semantic MCP                             | PASS                           | 23 tools discovered, 16 allowed, real Python symbol overview passed            |
@@ -28,6 +29,7 @@ Checked 2026-08-09. Evidence is from real commands; skipped checks are not count
 | 6     | ChatGPT UI/OAuth/write tests                    | BLOCKED BY EXTERNAL DEPENDENCY | Cannot connect host before resource/client registration                        |
 | 6     | Echo Desktop QCoder bridge                      | PASS                           | Live provider path returned `ECHO_DESKTOP_QCODER_OK` exactly                   |
 | 6     | Echo Desktop packaged host                      | BLOCKED BY EXTERNAL DEPENDENCY | Dirty pre-existing checkout and unavailable authenticated Desktop host context |
+| 6     | GitHub-hosted workflow execution                | BLOCKED BY EXTERNAL DEPENDENCY | Job received zero steps; GitHub annotated an account billing lock              |
 | 7     | Private-use plugin package                      | PASS                           | Allowlisted ZIP re-extracted and revalidated; SHA-256 sidecar generated        |
 | 7     | Public source release                           | PASS                           | Full tracked history scan found zero token/private-key candidates              |
 | 7     | Public ChatGPT submission                       | NOT APPLICABLE                 | Version 0.3.0 remains a private-use plugin                                     |
