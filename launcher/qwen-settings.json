@@ -8,6 +8,64 @@
       "enabled": true
     }
   },
+  "experimental": {
+    "todoStopGuard": true,
+    "agentTeam": false
+  },
+  "mcp": {
+    "allowed": ["qcoder-serena"]
+  },
+  "mcpServers": {
+    "qcoder-serena": {
+      "command": "serena",
+      "args": [
+        "start-mcp-server",
+        "--context",
+        "codex",
+        "--project-from-cwd",
+        "--enable-web-dashboard",
+        "false",
+        "--open-web-dashboard",
+        "false",
+        "--tool-timeout",
+        "120"
+      ],
+      "timeout": 120000,
+      "trust": false,
+      "description": "Pinned Serena semantic navigation and symbolic refactoring for the active QCoder workspace.",
+      "includeTools": [
+        "initial_instructions",
+        "activate_project",
+        "get_current_config",
+        "onboarding",
+        "get_symbols_overview",
+        "find_symbol",
+        "find_referencing_symbols",
+        "find_implementations",
+        "find_declaration",
+        "get_diagnostics_for_file",
+        "search_for_pattern",
+        "replace_symbol_body",
+        "insert_after_symbol",
+        "insert_before_symbol",
+        "rename_symbol",
+        "safe_delete_symbol"
+      ],
+      "excludeTools": [
+        "execute_shell_command",
+        "read_file",
+        "create_text_file",
+        "replace_content",
+        "replace_in_files",
+        "write_memory",
+        "read_memory",
+        "list_memories",
+        "delete_memory",
+        "rename_memory",
+        "edit_memory"
+      ]
+    }
+  },
   "security": {
     "auth": {
       "selectedType": "openai"

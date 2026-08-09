@@ -3,7 +3,9 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["**/dist/**", "**/coverage/**", "**/node_modules/**", "artifacts/**"] },
+  {
+    ignores: ["**/dist/**", "**/coverage/**", "**/node_modules/**", ".runtime/**", "artifacts/**"],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   {

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [string]$Role,
+    [string]$Role = 'cli-build',
     [string]$WorkerId,
     [string]$ResumeSession,
     [string]$Mission,
@@ -103,7 +103,7 @@ $launcher = @{
     MaxRestarts = $MaxRestarts
     RestartDelaySeconds = $RestartDelaySeconds
 }
-if ($Role) { $launcher.Role = $Role }
+$launcher.Role = $Role
 if ($ResumeSession) { $launcher.ResumeSession = $ResumeSession }
 $targetWorkspace = (Resolve-Path -LiteralPath $ProjectDir).Path
 $workspaceDirective = "Target workspace: $targetWorkspace. Read and follow its nearest AGENTS.md and CLAUDE.md files before editing."

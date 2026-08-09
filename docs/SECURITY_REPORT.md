@@ -16,6 +16,9 @@ Additional fixes include per-action and global quotas, request-size limits, serv
 - Dependency audits: root and isolated Inspector trees report zero vulnerabilities.
 - Secret scan: required release gate; no findings in the last complete verify run.
 - CSP/static manifest validation: narrow CSP, seven unique tools, all manifest paths resolved.
+- Powerpack supply-chain gate: 14 repositories have exact Git commit pins, permissive-license allowlisting, and pinned license digests; online HEAD and license revalidation passed.
+- Promptfoo 0.122.0 was removed after its installed tree reported six high and three moderate npm advisories. The remaining local powerpack audit reports zero vulnerabilities.
+- Serena is untrusted and constrained to an explicit semantic/refactor tool allowlist; shell, raw file, and memory tools are excluded from Qwen's profile.
 
 The managed deep security scanner was **BLOCKED BY EXTERNAL DEPENDENCY** after three attempts because its host did not expose the required filesystem permission profile. This is recorded as blocked, not passed; targeted manual review and automated security tests completed.
 

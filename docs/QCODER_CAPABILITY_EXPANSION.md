@@ -4,42 +4,61 @@ Checked: 2026-08-09 (America/Chicago)
 
 ## Outcome
 
-QCoder now ships four focused Qwen Code skills for coding, authorized all-color security operations, visual perception, and speech/voice routing. The skills reuse ECHO's scoped SOL broker, fleet roles, ShadowGlass, FORGE speech-to-text, Personality Forge, and Echo Desktop rather than granting an unaudited third-party agent unrestricted access.
+QCoder now launches directly as a governed `cli-build` agent and ships eight focused Qwen skills. A bounded Serena MCP gives it symbol navigation, reference graphs, diagnostics, and symbolic refactoring across TypeScript, Python, and PowerShell. Local ast-grep adds structural search, mini-SWE-agent supplies an independently invoked issue-to-patch reference loop, and QCoder's deterministic golden evaluator remains the release gate.
 
-Install them with `pwsh -File .\scripts\install-qwen-skills.ps1`. Qwen Code discovers personal skills from `~/.qwen/skills` on the next session.
+Install or refresh the full local powerpack:
 
-## Upstream repository review
+```powershell
+pwsh -File .\scripts\install-qcoder-powerpack.ps1
+```
 
-| Repository                                                   | Capability                                                                 | License/adoption posture                                               | Decision                                                                                                        |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `QwenLM/qwen-code`                                           | Terminal coding agent, skills, subagents, MCP, OpenAI-compatible providers | Apache-2.0                                                             | Already the QCoder shell. Upgrade only after launcher regression tests because HAMMER currently runs 0.15.6.    |
-| `QwenLM/Qwen-Agent`                                          | Function calling, MCP, code interpreter, RAG, browser assistant            | Apache-2.0 repository                                                  | Candidate for a sandboxed sidecar; do not replace the working Qwen Code terminal.                               |
-| `OpenHands/software-agent-sdk` and `OpenHands/OpenHands-CLI` | Modular coding-agent SDK and CLI                                           | MIT for these repositories                                             | Evaluate in an isolated coding benchmark before adding another builder lane.                                    |
-| `QwenLM/Qwen3-VL`                                            | OCR, document/video understanding, computer use, visual coding             | Apache-2.0                                                             | Preferred future vision sidecar. Do not co-load on the leased two-GPU 27B runtime without measured capacity.    |
-| `usestrix/strix`                                             | Agentic application pentesting, skills, PoC validation, remediation        | Apache-2.0                                                             | Best immediate security candidate, but only behind ECHO scope validation, confirmation, containment, and audit. |
-| `GreyDGL/PentestGPT`                                         | Docker-first autonomous penetration-testing agent and benchmarks           | Review pinned license and submodules before use                        | Benchmark/research candidate; no direct production integration.                                                 |
-| `aliasrobotics/CAI`                                          | Offensive/defensive security agents, guardrails, HITL, tracing             | Research-use additions; commercial/professional use requires a license | Do not integrate into ECHO production without a commercial license and telemetry review.                        |
-| `SYSTRAN/faster-whisper`                                     | Efficient local speech-to-text                                             | MIT                                                                    | Already represented by the live FORGE `echo.stt.transcribe` path; keep as the hearing default.                  |
-| `ggml-org/whisper.cpp`                                       | Portable C/C++ Whisper, realtime microphone example                        | MIT                                                                    | Fallback candidate for edge/CPU nodes where Python/CTranslate2 is undesirable.                                  |
-| `resemble-ai/chatterbox`                                     | Local TTS and voice cloning                                                | MIT                                                                    | Aligns with the existing ECHO voice stack; use through Personality Forge and consent controls.                  |
+The installer validates the pinned manifest first, uses exact package versions, keeps npm payloads under `.runtime/powerpack`, preserves other personal Qwen skills, and grants no new target, credential, or network authority. Qwen Code discovers the added skills and MCP configuration on the next session.
 
-## Capacity and sequencing
+## Verified repository set
 
-The active `huihui_ai/Qwen3.6-abliterated:27b` runtime occupies both FORGE GPUs. Coding remains primary and the sensory services are routed as separate services. A Qwen3-VL deployment is a later measured sidecar or a different-node placement, not an unbounded third model on the same lease.
+`config/qcoder-powerpack.json` is the machine-readable source of truth. Every entry pins the repository HEAD checked on 2026-08-09, an MIT or Apache-2.0 license, and the SHA-256 of that license text.
+
+| Repository                     | Capability                                                      | Posture            | Result                                                                                        |
+| ------------------------------ | --------------------------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------- |
+| `oraios/serena`                | Semantic symbols, references, diagnostics, symbolic refactoring | Integrated         | Serena 1.6.1 installed; MCP connected; real Python symbol overview passed.                    |
+| `ast-grep/ast-grep`            | AST search, rewrite, custom structural lint                     | Integrated         | `@ast-grep/cli` 0.45.1 installed locally and version-verified.                                |
+| `SWE-agent/mini-swe-agent`     | Small issue-to-patch loop and SWE-bench patterns                | Installable        | 2.4.6 installed with `uv`; invocation remains explicit and separately governed.               |
+| `Aider-AI/aider`               | Repository maps, edit formats, Git-aware coding                 | Reference          | Patterns retained; no competing interactive agent added to the live Qwen session.             |
+| `aaif-goose/goose`             | Extensions, recoverable workflows, MCP agent patterns           | Reference          | Patterns retained for future lane evaluation.                                                 |
+| `OpenHands/software-agent-sdk` | Agent lifecycle and ephemeral workspace patterns                | Reference          | Patterns retained; no second runtime embedded.                                                |
+| `browser-use/browser-use`      | Browser recovery loops and structured page state                | Reference          | QCoder skill routes web work through ECHO's governed browser path.                            |
+| `projectdiscovery/nuclei`      | Template-driven protocol and vulnerability validation           | Sidecar            | Reserved for scoped pentester execution; never loaded into ordinary coding sessions.          |
+| `NVIDIA/garak`                 | LLM vulnerability and prompt-injection evaluation               | Sidecar            | Reserved for isolated model-security evaluation.                                              |
+| `promptfoo/promptfoo`          | Model regression and red-team evaluation                        | Reference/withheld | 0.122.0 was removed after its installed tree reported six high and three moderate advisories. |
+| `QwenLM/Qwen3-VL`              | Visual code, document understanding, computer-use perception    | Sidecar            | Separate-node/service placement only; not co-loaded with the leased 27B coder.                |
+| `SYSTRAN/faster-whisper`       | Local speech-to-text                                            | Sidecar            | Routed through the existing FORGE speech service.                                             |
+| `resemble-ai/chatterbox`       | Local TTS and registered voice cloning                          | Sidecar            | Routed through Personality Forge and existing consent controls.                               |
+| `PaddlePaddle/PaddleOCR`       | OCR, layout parsing, multilingual documents                     | Sidecar            | Preferred deterministic OCR companion before expensive multimodal inference.                  |
+
+## Qwen skill inventory
+
+- `qcoder-coding-builder`: governed repository implementation and verification.
+- `qcoder-semantic-navigator`: symbol-first investigation and bounded refactoring.
+- `qcoder-autonomous-issue-solver`: evidence-to-patch loop with recovery and regression proof.
+- `qcoder-self-evaluator`: deterministic tests, golden prompts, MCP checks, and security gates.
+- `qcoder-authorized-security`: scoped all-color security planning, execution, cleanup, and retest.
+- `qcoder-browser-researcher`: source-grounded browser research through the governed ECHO browser path.
+- `qcoder-vision-operator`: OCR and visual analysis through sidecars without displacing the coder.
+- `qcoder-audio-operator`: local speech-to-text, voice routing, and consent-aware output.
+
+## Runtime boundaries
+
+The active `huihui_ai/Qwen3.6-abliterated:27b` runtime holds the FORGE two-GPU coding lease. Vision, OCR, hearing, voice, and security scanners remain services or separately authorized sidecars. The ChatGPT plugin continues to use `qwen-plugin-settings.json`, where MCP, shell, web fetch, and sub-agent spawning are denied; only direct local QCoder sessions receive the bounded Serena profile in `qwen-settings.json`.
 
 ## Security adoption gate
 
-Before importing any upstream agent or skill:
+Before any reference or sidecar becomes integrated:
 
-1. Pin a commit and verify its license.
-2. Review install scripts, containers, telemetry, network destinations, and credential handling.
-3. Run secret, dependency, and static security scans.
-4. Wrap it in an allowlisted target/scope contract with bounded time, output, and filesystem access.
-5. Require the ECHO pentester role and exact confirmation for active operations.
+1. Revalidate its exact commit and license digest.
+2. Review installers, containers, telemetry, network destinations, and credential handling.
+3. Run dependency, secret, and static security scans.
+4. Bind the capability to an allowlisted target, bounded time/output/filesystem, and explicit role.
+5. Require confirmation and audit for active security or destructive actions.
 6. Preserve evidence, clean up, and independently retest.
 
-No reviewed repository was cloned or executed during this pass; this avoids silently giving an external agent network, shell, or credential authority.
-
-## Current limitation
-
-The live capability registry exposes local FORGE speech-to-text and Personality Forge operations, but did not return the documented generic `echo.voice.speak` alias. QCoder voice therefore routes through Echo Desktop/local playback until that specific registration is restored and verified. This is recorded as degraded capability, not a successful synthesis claim.
+The online validator fails closed on repository HEAD drift or license-text changes. A manifest entry is research provenance, not authority.

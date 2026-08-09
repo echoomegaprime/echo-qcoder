@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-09T13:32:30-05:00",
+  "policy": {
+    "allowedLicenses": ["MIT", "Apache-2.0"],
+    "defaultNetwork": "deny",
+    "defaultTrust": false,
+    "installMode": "exact-version-only",
+    "notes": "Repository presence in this manifest grants no shell, network, credential, or target authority. Runtime access remains governed by QCoder, SOL, and ECHO scope controls."
+  },
+  "repositories": [
+    {
+      "id": "serena",
+      "repository": "oraios/serena",
+      "source": "https://github.com/oraios/serena",
+      "commit": "946ad9817875cbf46b308423296c33eb65e3e728",
+      "branch": "main",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseSha256": "16017e50562bb112006f6f32d17ca989e0e573b011bd6790b642018b1c195b0c",
+      "package": "serena-agent==1.6.1",
+      "posture": "integrated",
+      "capabilities": [
+        "semantic-symbol-search",
+        "reference-graph",
+        "diagnostics",
+        "symbolic-refactoring"
+      ]
+    },
+    {
+      "id": "ast-grep",
+      "repository": "ast-grep/ast-grep",
+      "source": "https://github.com/ast-grep/ast-grep",
+      "commit": "e8c70a7c7a6f8b73827e507b65201da8cea0ab79",
+      "branch": "main",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseSha256": "81471889c77b2161a3e4dcdb1b2e6ca382e485766132d92d5fe1d7497e7dd2d9",
+      "package": "@ast-grep/cli@0.45.1",
+      "posture": "integrated",
+      "capabilities": ["ast-search", "structural-rewrite", "custom-lint-rules"]
+    },
+    {
+      "id": "aider",
+      "repository": "Aider-AI/aider",
+      "source": "https://github.com/Aider-AI/aider",
+      "commit": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE.txt",
+      "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "package": "aider-chat==0.86.2",
+      "posture": "reference",
+      "capabilities": ["repository-map", "edit-formats", "git-aware-pair-programming"]
+    },
+    {
+      "id": "goose",
+      "repository": "aaif-goose/goose",
+      "source": "https://github.com/aaif-goose/goose",
+      "commit": "064244e6bddf641876676f054a006b7da1da5182",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE",
+      "licenseSha256": "44459b86c2e96fdbfd8a6b5c33d30d4b04b5293fcb2ec96fe4dcc4e0f90b8962",
+      "posture": "reference",
+      "capabilities": ["extension-routing", "recoverable-workflows", "mcp-agent-patterns"]
+    },
+    {
+      "id": "openhands-agent-sdk",
+      "repository": "OpenHands/software-agent-sdk",
+      "source": "https://github.com/OpenHands/software-agent-sdk",
+      "commit": "be6cd3b80b706bb14c91e604581a8de75cad61cc",
+      "branch": "main",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseSha256": "14a9b631c658eee682c6c2973525fbdf808c3457176bc47513052c559cc5ce86",
+      "posture": "reference",
+      "capabilities": [
+        "agent-lifecycle",
+        "ephemeral-workspaces",
+        "multi-agent-maintenance-patterns"
+      ]
+    },
+    {
+      "id": "mini-swe-agent",
+      "repository": "SWE-agent/mini-swe-agent",
+      "source": "https://github.com/SWE-agent/mini-swe-agent",
+      "commit": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+      "branch": "main",
+      "license": "MIT",
+      "licensePath": "LICENSE.md",
+      "licenseSha256": "0f796e58f91d1c07bb2c1b1d0f8bf3a83017c3a5dec1bdc6fae733b2cd2e875b",
+      "package": "mini-swe-agent==2.4.6",
+      "posture": "installable",
+      "capabilities": ["issue-to-patch-loop", "bounded-command-observation", "swe-bench-patterns"]
+    },
+    {
+      "id": "browser-use",
+      "repository": "browser-use/browser-use",
+      "source": "https://github.com/browser-use/browser-use",
+      "commit": "32601887cfbc9f4f1e3cad3e2b678e56aeaeaae4",
+      "branch": "main",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseSha256": "135c57671b0ee957669b05a0ca00cc06f645496d351e2e732832c6e276da9a5e",
+      "package": "browser-use==0.13.7",
+      "posture": "reference",
+      "capabilities": ["browser-recovery-loop", "domain-allowlists", "structured-browser-state"]
+    },
+    {
+      "id": "nuclei",
+      "repository": "projectdiscovery/nuclei",
+      "source": "https://github.com/projectdiscovery/nuclei",
+      "commit": "dfdfa5fd65503a3884f2098a1c9d4d5f28bf1756",
+      "branch": "dev",
+      "license": "MIT",
+      "licensePath": "LICENSE.md",
+      "licenseSha256": "5fa6644d2dd1987a79c06f4af210d2cf8cfc4ee799999029d0f9980c9cf95a2c",
+      "posture": "sidecar",
+      "capabilities": [
+        "template-driven-vulnerability-validation",
+        "protocol-scanning",
+        "structured-findings"
+      ]
+    },
+    {
+      "id": "garak",
+      "repository": "NVIDIA/garak",
+      "source": "https://github.com/NVIDIA/garak",
+      "commit": "cafbe992780df70015de7295ca026b70c4629ada",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE",
+      "licenseSha256": "f12c175308d657ab393ca79f063063501273d43c14200d3ba7b214ca8e50523e",
+      "package": "garak==0.16.0",
+      "posture": "sidecar",
+      "capabilities": [
+        "llm-vulnerability-probes",
+        "prompt-injection-evaluation",
+        "data-leakage-tests"
+      ]
+    },
+    {
+      "id": "promptfoo",
+      "repository": "promptfoo/promptfoo",
+      "source": "https://github.com/promptfoo/promptfoo",
+      "commit": "49c0f6d77496c022c6d32e362522993bb0d72d42",
+      "branch": "main",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseSha256": "bf813686553f451e1b833fbd827488aee49b60b189626915bf3108d10b754e44",
+      "package": "promptfoo@0.122.0",
+      "posture": "reference",
+      "capabilities": ["model-regression-evals", "agent-red-team", "ci-quality-gates"]
+    },
+    {
+      "id": "qwen3-vl",
+      "repository": "QwenLM/Qwen3-VL",
+      "source": "https://github.com/QwenLM/Qwen3-VL",
+      "commit": "96588727e44c78b25ba03ea03b8e12f7e64fd0da",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE",
+      "licenseSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "posture": "sidecar",
+      "capabilities": ["visual-code-understanding", "document-vision", "computer-use-perception"]
+    },
+    {
+      "id": "faster-whisper",
+      "repository": "SYSTRAN/faster-whisper",
+      "source": "https://github.com/SYSTRAN/faster-whisper",
+      "commit": "ed9a06cd89a93e47838f564998a6c09b655d7f43",
+      "branch": "master",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseSha256": "af6798135e729f8aa6c853936d037dfdea449734d26b8ea6a89805fca758c0d5",
+      "package": "faster-whisper==1.2.1",
+      "posture": "sidecar",
+      "capabilities": ["local-speech-to-text", "timestamps", "cpu-offload-transcription"]
+    },
+    {
+      "id": "chatterbox",
+      "repository": "resemble-ai/chatterbox",
+      "source": "https://github.com/resemble-ai/chatterbox",
+      "commit": "5de7a54aa4e5e2baadb0182dde554908b48b85c2",
+      "branch": "master",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseSha256": "4248e910a928849fe5815a0f9236e17fa07768d95b9193212752c464b93d6caa",
+      "posture": "sidecar",
+      "capabilities": ["local-text-to-speech", "registered-voice-cloning", "voice-expression"]
+    },
+    {
+      "id": "paddleocr",
+      "repository": "PaddlePaddle/PaddleOCR",
+      "source": "https://github.com/PaddlePaddle/PaddleOCR",
+      "commit": "2661c7c0ef5c613e8f93c6e93b2e052399f0f854",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE",
+      "licenseSha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e",
+      "posture": "sidecar",
+      "capabilities": ["document-ocr", "layout-parsing", "multilingual-text-extraction"]
+    }
+  ]
+}

@@ -11,13 +11,13 @@ This repository also packages QCoder Console, a private full-bundle ChatGPT/Code
 - List sessions or inspect bounded, redacted transcripts.
 - Queue a follow-up task with optimistic concurrency and idempotency.
 - Render the session console and stop a session with two-stage confirmation.
-- Use four focused Qwen skills for governed coding, authorized all-color security validation, browser/vision work, and local speech/voice workflows.
+- Use eight focused Qwen skills for coding, semantic navigation, autonomous issue solving, self-evaluation, authorized all-color security validation, browser/vision work, and local speech/voice workflows.
 
 It does not expose a general shell, arbitrary filesystem access, unregistered workspaces, anonymous writes, public posting, or unrestricted security tooling.
 
 ## Architecture
 
-The MCP server exposes Streamable HTTP at `/mcp` plus `/healthz`, `/readyz`, and `/version`. SQLite stores session state, idempotency records, and stop audits; bounded JSONL files store redacted transcripts. The server launches `launcher/qcoder.ps1`, which acquires the FORGE GPU lease and runs Qwen Code with the remote-safe `qwen-plugin-settings.json` profile. The single-file React UI uses the MCP Apps bridge and resource `ui://qcoder/console/v1`.
+The MCP server exposes Streamable HTTP at `/mcp` plus `/healthz`, `/readyz`, and `/version`. SQLite stores session state, idempotency records, and stop audits; bounded JSONL files store redacted transcripts. The server launches `launcher/qcoder.ps1`, which acquires the FORGE GPU lease and runs Qwen Code with the remote-safe `qwen-plugin-settings.json` profile. Direct local `qcoder` sessions default to the `cli-build` role and add a bounded Serena semantic MCP profile for TypeScript, Python, and PowerShell. The single-file React UI uses the MCP Apps bridge and resource `ui://qcoder/console/v1`.
 
 HTTP mode requires resource-bound OAuth introspection plus per-tool scopes and explicit client, tenant, role, and workspace claims. Trusted local stdio is available only when `QCODER_TRUSTED_STDIO=1` is set by the packaged MCP configuration.
 
@@ -52,7 +52,13 @@ Install or refresh the QCoder-specific Qwen skills without disturbing other pers
 pwsh -File .\scripts\install-qwen-skills.ps1
 ```
 
-Qwen Code discovers them on the next session. In a session, `/skills qcoder-coding-builder` invokes one explicitly. The upstream repository review and phased adoption decisions are recorded in [QCoder capability expansion](docs/QCODER_CAPABILITY_EXPANSION.md).
+Install the audited local powerpack (Serena 1.6.1, ast-grep 0.45.1, mini-SWE-agent 2.4.6, the eight Qwen skills, and the built-in regression evaluator):
+
+```powershell
+pwsh -File .\scripts\install-qcoder-powerpack.ps1
+```
+
+Qwen Code discovers newly installed skills and MCP configuration on the next session. In a session, `/skills qcoder-coding-builder` invokes one explicitly. Promptfoo is pinned only as a reviewed reference: its 0.122.0 installation was removed after its reachable transitive tree failed the high-severity dependency audit. The full 14-repository manifest and adoption decisions are recorded in [QCoder capability expansion](docs/QCODER_CAPABILITY_EXPANSION.md).
 
 For local HTTP development, configure the four OAuth variables shown in `.env.example`, then run `pwsh -File .\scripts\run-local.ps1`. For trusted stdio, use `pwsh -File .\scripts\run-local.ps1 -Mode stdio`.
 
@@ -68,4 +74,4 @@ See [local testing](docs/LOCAL_TESTING.md), [deployment](docs/DEPLOYMENT.md), [s
 
 ## Versioning
 
-Tool names and required fields remain backward compatible within `0.1.x`. Incompatible UI changes receive a new `ui://` resource version. The plugin archive is deterministic where the ZIP implementation permits and always receives a SHA-256 sidecar.
+Tool names and required fields remain backward compatible within `0.2.x`. Incompatible UI changes receive a new `ui://` resource version. The plugin archive is deterministic where the ZIP implementation permits and always receives a SHA-256 sidecar.

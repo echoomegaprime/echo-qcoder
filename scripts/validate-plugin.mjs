@@ -41,6 +41,10 @@ const qwenSkillNames = [
   "qcoder-authorized-security",
   "qcoder-vision-operator",
   "qcoder-audio-operator",
+  "qcoder-semantic-navigator",
+  "qcoder-autonomous-issue-solver",
+  "qcoder-browser-researcher",
+  "qcoder-self-evaluator",
 ];
 for (const name of qwenSkillNames) {
   const path = resolve(qwenSkillsRoot, name, "SKILL.md");

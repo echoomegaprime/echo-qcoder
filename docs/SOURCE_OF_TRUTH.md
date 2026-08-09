@@ -1,6 +1,6 @@
 # QCoder Plugin Source of Truth
 
-Checked: 2026-08-09T10:45:29-05:00 (America/Chicago)
+Checked: 2026-08-09T13:32:30-05:00 (America/Chicago)
 
 ## Official OpenAI documentation reviewed
 
@@ -35,16 +35,19 @@ The system-monitor example is the closest match because QCoder renders a live pr
 
 ## Qwen and capability repositories reviewed
 
-Current upstream repository state was checked again on 2026-08-09 before selecting power-ups:
+Current upstream repository state and license text were checked again on 2026-08-09 before selecting power-ups. Exact commits and license SHA-256 values are machine-readable in `config/qcoder-powerpack.json`:
 
 - [Qwen Code](https://github.com/QwenLM/qwen-code) for terminal skills, subagents, MCP, and provider compatibility.
 - [Qwen-Agent](https://github.com/QwenLM/Qwen-Agent) for function calling, MCP, RAG, browser, and sandboxed code-interpreter patterns.
 - [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL) for future OCR, UI understanding, visual coding, and computer-use sidecar work.
-- [OpenHands software-agent-sdk](https://github.com/OpenHands/software-agent-sdk) and [OpenHands CLI](https://github.com/OpenHands/OpenHands-CLI) as MIT coding-agent candidates.
-- [Strix](https://github.com/usestrix/strix), [PentestGPT](https://github.com/GreyDGL/PentestGPT), and [CAI](https://github.com/aliasrobotics/CAI) as security-agent candidates. Strix is the preferred Apache-2.0 sandbox evaluation target; CAI production/professional additions were rejected without a commercial license.
-- [faster-whisper](https://github.com/SYSTRAN/faster-whisper), [whisper.cpp](https://github.com/ggml-org/whisper.cpp), and [Chatterbox](https://github.com/resemble-ai/chatterbox) for hearing and local voice paths.
+- [Serena](https://github.com/oraios/serena) and [ast-grep](https://github.com/ast-grep/ast-grep) for bounded semantic and structural repository navigation.
+- [Aider](https://github.com/Aider-AI/aider), [Goose](https://github.com/aaif-goose/goose), [OpenHands software-agent-sdk](https://github.com/OpenHands/software-agent-sdk), and [mini-SWE-agent](https://github.com/SWE-agent/mini-swe-agent) for repository maps, recoverable agent loops, lifecycle isolation, and issue-to-patch patterns.
+- [browser-use](https://github.com/browser-use/browser-use) for browser recovery patterns, not credential or browser authority.
+- [Nuclei](https://github.com/projectdiscovery/nuclei) and [Garak](https://github.com/NVIDIA/garak) as governed security sidecars.
+- [Promptfoo](https://github.com/promptfoo/promptfoo) as a reference only; the selected 0.122.0 package was removed because its installed dependency graph failed the high-severity audit gate.
+- [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL), [faster-whisper](https://github.com/SYSTRAN/faster-whisper), [Chatterbox](https://github.com/resemble-ai/chatterbox), and [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) as separately placed perception and voice sidecars.
 
-No third-party agent was cloned or executed during this pass. The governed Qwen skills route to existing ECHO capabilities while preserving target scope, consent, audit, and GPU lease boundaries.
+Serena, ast-grep, and mini-SWE-agent were installed from exact package versions. Serena's MCP connection and a real Python symbol query passed. Repository inclusion does not grant shell, network, target, or credential authority; unintegrated projects remain patterns or independently governed sidecars.
 
 ## Selected runtime and packages
 

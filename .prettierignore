@@ -2,5 +2,6 @@ node_modules
 dist
 coverage
 artifacts
+.runtime
 package-lock.json
 *.jsonl
