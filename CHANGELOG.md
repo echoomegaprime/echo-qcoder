@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 - 2026-08-09
+
+- Upgraded and exact-version pinned Qwen Code 0.21.8.
+- Added a reproducible `c3po-code:qcoder-32k` Ollama derivative and raised the QCoder context contract from 8K to 32K without replacing the source model tag.
+- Fixed headless Qwen 0.21.8 output by reducing `stream-json` to visible assistant text while suppressing hidden reasoning and initialization payloads.
+- Expanded the supply-chain manifest from 14 to 21 permissively licensed repositories, adding Qwen Code, Qwen-Agent, Playwright MCP, Spec Kit, MarkItDown, PR-Agent, and Superpowers patterns.
+- Added a six-hour GitHub autonomy tick, persistent failure-issue reconciliation, weekly Dependabot coverage, and public-source hardening.
+- Stopped tracking generated Python bytecode while preserving the live local files.
+
 ## 0.2.0 - 2026-08-09
 
 - Added a 14-repository, exact-commit, license-digest-verified capability manifest.

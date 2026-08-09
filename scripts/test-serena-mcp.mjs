@@ -8,7 +8,7 @@ const settings = JSON.parse(readFileSync(resolve(root, "launcher/qwen-settings.j
 const config = settings.mcpServers?.["qcoder-serena"];
 if (!config) throw new Error("qcoder-serena MCP configuration is missing");
 
-const client = new Client({ name: "qcoder-serena-smoke", version: "0.2.0" });
+const client = new Client({ name: "qcoder-serena-smoke", version: "0.3.0" });
 const transport = new StdioClientTransport({
   command: config.command,
   args: config.args,

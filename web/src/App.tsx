@@ -18,7 +18,7 @@ function resultSessionId(result: CallToolResult): string | null {
 export function QCoderConsole() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const { app, error } = useApp({
-    appInfo: { name: "QCoder Console", version: "0.2.0" },
+    appInfo: { name: "QCoder Console", version: "0.3.0" },
     capabilities: {},
     onAppCreated: (instance) => {
       instance.ontoolinput = (input) => {

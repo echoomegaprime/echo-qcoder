@@ -9,8 +9,8 @@ const readJson = (path) => JSON.parse(readFileSync(resolve(root, path), "utf8"))
 test("powerpack pins a unique permissive upstream set", () => {
   const manifest = readJson("config/qcoder-powerpack.json");
   assert.equal(manifest.schemaVersion, 1);
-  assert.equal(manifest.repositories.length, 14);
-  assert.equal(new Set(manifest.repositories.map(({ id }) => id)).size, 14);
+  assert.equal(manifest.repositories.length, 21);
+  assert.equal(new Set(manifest.repositories.map(({ id }) => id)).size, 21);
 
   for (const repository of manifest.repositories) {
     assert.match(repository.id, /^[a-z0-9][a-z0-9-]*$/u);
@@ -21,6 +21,22 @@ test("powerpack pins a unique permissive upstream set", () => {
     assert.ok(["MIT", "Apache-2.0"].includes(repository.license));
     assert.ok(["integrated", "installable", "sidecar", "reference"].includes(repository.posture));
     assert.ok(repository.capabilities.length > 0);
+  }
+});
+
+test("the upstream set includes the autonomous coding lifecycle", () => {
+  const manifest = readJson("config/qcoder-powerpack.json");
+  const ids = new Set(manifest.repositories.map(({ id }) => id));
+  for (const id of [
+    "qwen-code",
+    "qwen-agent",
+    "playwright-mcp",
+    "spec-kit",
+    "markitdown",
+    "pr-agent",
+    "superpowers",
+  ]) {
+    assert.ok(ids.has(id), `${id} is missing`);
   }
 });
 
@@ -70,12 +86,29 @@ test("all focused Qwen power skills are packaged", () => {
 test("installer is allowlisted and never pipes remote scripts to a shell", () => {
   const installer = readFileSync(resolve(root, "scripts/install-qcoder-powerpack.ps1"), "utf8");
   assert.doesNotMatch(installer, /curl[^\r\n|]*\|\s*(?:ba)?sh/iu);
-  assert.match(installer, /ValidateSet\('Semantic', 'IssueSolver', 'Evaluation'\)/u);
+  assert.match(installer, /ValidateSet\('Core', 'Semantic', 'IssueSolver', 'Evaluation'\)/u);
+  assert.match(installer, /Get-PinnedPackage -Id 'qwen-code'/u);
+  assert.match(installer, /Get-Command qwen/u);
+  assert.match(installer, /--prefix/u);
   assert.match(installer, /Get-PinnedPackage -Id 'serena'/u);
   assert.match(installer, /Get-PinnedPackage -Id 'ast-grep'/u);
   assert.doesNotMatch(installer, /Get-PinnedPackage -Id 'promptfoo'/u);
   assert.match(installer, /promptfoo=withheld-high-transitive-audit/u);
   assert.match(installer, /install-qwen-skills\.ps1'\) -Force/u);
+});
+
+test("FORGE model provisioning creates a bounded 32K derivative without replacing the source", () => {
+  const provisioning = readFileSync(
+    resolve(root, "deployment/forge/provision-qcoder-model.sh"),
+    "utf8",
+  );
+  assert.match(provisioning, /source_model=.*c3po-code:latest/u);
+  assert.match(provisioning, /target_model=.*c3po-code:qcoder-32k/u);
+  assert.match(provisioning, /context_length=.*32768/u);
+  assert.match(provisioning, /ollama show --modelfile/u);
+  assert.match(provisioning, /ollama create/u);
+  assert.match(provisioning, /actual_context/u);
+  assert.doesNotMatch(provisioning, /ollama (?:rm|delete)/u);
 });
 
 test("release staging excludes unrelated untracked files", () => {

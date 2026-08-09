@@ -2,7 +2,7 @@
 
 ## Supported version
 
-Security fixes are applied to the current `0.1.x` private-release line. QCoder Console is not a public service or public plugin.
+Security fixes are applied to the current `0.3.x` release line. The source repository is public; QCoder Console remains neither a public service nor a public ChatGPT-directory plugin.
 
 ## Reporting
 
@@ -24,3 +24,5 @@ Secrets belong in the deployment secret store and never in source, `.app.json`, 
 ## Dependencies
 
 Dependencies are exact-version locked. The MCP Inspector is isolated under `scripts/inspector` so its terminal UI peer dependencies cannot alter the React application graph. CI runs dependency audit, tests, build, MCP protocol validation, secret scan, and package validation.
+
+The scheduled autonomy tick has only `contents: read` and `issues: write`; it cannot push, merge, release, deploy, or read repository secrets. Generated Python bytecode, local runtime state, logs, environment files, and release artifacts are excluded from source control.

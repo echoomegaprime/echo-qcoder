@@ -1,8 +1,8 @@
 # Echo QCoder
 
-Echo QCoder is ECHO's governed, zero-metered builder backed by the FORGE-hosted `huihui_ai/Qwen3.6-abliterated:27b` model. The `qcoder` PowerShell alias launches Qwen Code with the repository's `AGENTS.md` and `CLAUDE.md`, a durable SOL mission, role-scoped broker access, and a verified dual-GPU lease.
+Echo QCoder is ECHO's governed, zero-metered builder backed by the FORGE-hosted `huihui_ai/Qwen3.6-abliterated:27b` model. The `qcoder` PowerShell alias launches Qwen Code 0.21.8 with the repository's `AGENTS.md` and `CLAUDE.md`, a durable SOL mission, role-scoped broker access, a 32K context profile, and a verified dual-GPU lease.
 
-This repository also packages QCoder Console, a private full-bundle ChatGPT/Codex plugin with one focused skill, seven MCP tools, and an accessible MCP Apps console. It starts, inspects, steers, and stops named builder sessions without exposing raw shell, arbitrary paths, process IDs, or credentials.
+This public source repository also packages QCoder Console, a private-use full-bundle ChatGPT/Codex plugin with one focused skill, seven MCP tools, and an accessible MCP Apps console. It starts, inspects, steers, and stops named builder sessions without exposing raw shell, arbitrary paths, process IDs, or credentials. Publishing the source does not publish ECHO's OAuth authority, private model endpoint, credentials, registered workspaces, or ChatGPT connection.
 
 ## Supported workflows
 
@@ -30,7 +30,7 @@ HTTP mode requires resource-bound OAuth introspection plus per-tool scopes and e
 - Windows PowerShell 7
 - Node.js 24+ and npm 11+
 - Python 3.11+
-- Qwen Code 0.15.6+
+- Qwen Code 0.21.8 (installed and exact-version verified by the powerpack installer)
 - FORGE connectivity and the existing ECHO SOL/GPU-lease runtime
 
 ## Install and verify
@@ -52,13 +52,23 @@ Install or refresh the QCoder-specific Qwen skills without disturbing other pers
 pwsh -File .\scripts\install-qwen-skills.ps1
 ```
 
-Install the audited local powerpack (Serena 1.6.1, ast-grep 0.45.1, mini-SWE-agent 2.4.6, the eight Qwen skills, and the built-in regression evaluator):
+Install the audited local powerpack (Qwen Code 0.21.8, Serena 1.6.1, ast-grep 0.45.1, mini-SWE-agent 2.4.6, the eight Qwen skills, and the built-in regression evaluator):
 
 ```powershell
 pwsh -File .\scripts\install-qcoder-powerpack.ps1
 ```
 
-Qwen Code discovers newly installed skills and MCP configuration on the next session. In a session, `/skills qcoder-coding-builder` invokes one explicitly. Promptfoo is pinned only as a reviewed reference: its 0.122.0 installation was removed after its reachable transitive tree failed the high-severity dependency audit. The full 14-repository manifest and adoption decisions are recorded in [QCoder capability expansion](docs/QCODER_CAPABILITY_EXPANSION.md).
+Qwen Code discovers newly installed skills and MCP configuration on the next session. In a session, `/skills qcoder-coding-builder` invokes one explicitly. Promptfoo is pinned only as a reviewed reference: its 0.122.0 installation was removed after its reachable transitive tree failed the high-severity dependency audit. The full 21-repository manifest and adoption decisions are recorded in [QCoder capability expansion](docs/QCODER_CAPABILITY_EXPANSION.md).
+
+## Continuous autonomy
+
+The repository runs a fail-closed QCoder autonomy tick every six hours. It checks pinned upstream commits and license digests, audits both npm dependency trees, and runs the regression suite. A failure updates one persistent GitHub issue instead of creating alert noise; recovery closes that issue. Dependabot checks npm workspaces, the isolated MCP Inspector tree, and GitHub Actions weekly. Run the same gate locally:
+
+```powershell
+node .\scripts\autonomy-tick.mjs --output .\artifacts\qcoder-autonomy-report.json
+```
+
+The tick proposes and reports drift; it never auto-merges code, grants new authority, or weakens a security boundary.
 
 For local HTTP development, configure the four OAuth variables shown in `.env.example`, then run `pwsh -File .\scripts\run-local.ps1`. For trusted stdio, use `pwsh -File .\scripts\run-local.ps1 -Mode stdio`.
 
@@ -74,4 +84,4 @@ See [local testing](docs/LOCAL_TESTING.md), [deployment](docs/DEPLOYMENT.md), [s
 
 ## Versioning
 
-Tool names and required fields remain backward compatible within `0.2.x`. Incompatible UI changes receive a new `ui://` resource version. The plugin archive is deterministic where the ZIP implementation permits and always receives a SHA-256 sidecar.
+Tool names and required fields remain backward compatible within `0.3.x`. Incompatible UI changes receive a new `ui://` resource version. The plugin archive is deterministic where the ZIP implementation permits and always receives a SHA-256 sidecar.

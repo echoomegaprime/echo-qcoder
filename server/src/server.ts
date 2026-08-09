@@ -20,7 +20,7 @@ export interface McpServerDependencies {
 
 export function createQCoderMcpServer(dependencies: McpServerDependencies): McpServer {
   const server = new McpServer(
-    { name: "echo-qcoder-console", version: "0.2.0" },
+    { name: "echo-qcoder-console", version: "0.3.0" },
     {
       instructions:
         "Control only authenticated, governed QCoder sessions in registered workspaces. Preview before start, use stable IDs and revisions, and never approximate raw terminal or arbitrary shell access.",
