@@ -133,3 +133,24 @@ test("repository gates ignore the isolated powerpack runtime", () => {
   assert.match(prettierIgnore, /^\.runtime$/mu);
   assert.ok((verifier.match(/\\\.runtime\[\\\\\/\]/gu) ?? []).length >= 2);
 });
+
+test("documented safety annotations match the conservative write-tool definitions", () => {
+  const contracts = readFileSync(resolve(root, "docs/TOOL_CONTRACTS.md"), "utf8");
+  const definitions = readFileSync(resolve(root, "server/src/tools/definitions.ts"), "utf8");
+
+  for (const [name, nextName] of [
+    ["start_qcoder_session", "send_qcoder_task"],
+    ["send_qcoder_task", "stop_qcoder_session"],
+  ]) {
+    const contractSection = contracts
+      .split(`## ${contracts.includes(`## 4. \`${name}\``) ? "4" : "5"}. \`${name}\``)[1]
+      .split(`## ${name === "start_qcoder_session" ? "5" : "6"}. \`${nextName}\``)[0];
+    const definitionSection = definitions.split(`name: "${name}"`)[1].split("securitySchemes:")[0];
+    assert.match(contractSection, /destructiveHint=true/u, `${name} contract must be conservative`);
+    assert.match(
+      definitionSection,
+      /destructiveHint: true/u,
+      `${name} definition must be conservative`,
+    );
+  }
+});
