@@ -12,7 +12,7 @@ Checked 2026-08-09. Evidence is from real commands; skipped checks are not count
 | 3     | UI automated tests                              | PASS                           | 7/7                                                                            |
 | 3     | Python launcher tests                           | PASS                           | 17/17                                                                          |
 | 3     | Qwen-native skill contracts                     | PASS                           | 8/8 manifests validated, installed, and source-hash checked                    |
-| 3     | Powerpack/autonomy contracts                    | PASS                           | 15/15 tests; installer rerun completed idempotently                            |
+| 3     | Powerpack/autonomy contracts                    | PASS                           | 16/16 tests; installer rerun completed idempotently                            |
 | 3     | Upstream commit/license verification            | PASS                           | 21/21 exact repository HEADs and license SHA-256 values revalidated online     |
 | 3     | Golden prompt regression                        | PASS                           | 60/60, zero unsafe activations                                                 |
 | 3     | Six-hour HAMMER autonomy task                   | PASS                           | Enabled `PT6H`; immediate run completed with Task Scheduler result `0`         |
