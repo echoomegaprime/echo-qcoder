@@ -46,11 +46,11 @@ try {
     & node .\scripts\mcp-smoke.mjs "http://127.0.0.1:$Port/mcp"
     if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     if ($Inspector) {
-        $inspector = Join-Path $root 'scripts\inspector\node_modules\.bin\mcp-inspector.cmd'
-        if (-not (Test-Path -LiteralPath $inspector)) {
+        $inspectorCommand = Join-Path $root 'scripts\inspector\node_modules\.bin\mcp-inspector.cmd'
+        if (-not (Test-Path -LiteralPath $inspectorCommand)) {
             throw 'Locked MCP Inspector dependency is not installed. Run npm ci --prefix scripts/inspector.'
         }
-        & $inspector --cli "http://127.0.0.1:$Port/mcp" --method tools/list
+        & $inspectorCommand --cli "http://127.0.0.1:$Port/mcp" --method tools/list
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     }
     Write-Host "QCODER_MCP_SMOKE_OK health=ok ready=ready version=$($version.version)"

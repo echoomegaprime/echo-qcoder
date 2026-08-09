@@ -119,6 +119,12 @@ test("release staging excludes unrelated untracked files", () => {
   assert.match(staging, /web\/dist\/\*/u);
 });
 
+test("MCP Inspector switch is not overwritten by a same-name command variable", () => {
+  const smoke = readFileSync(resolve(root, "scripts/test-mcp.ps1"), "utf8");
+  assert.doesNotMatch(smoke, /\$inspector\s*=/iu);
+  assert.match(smoke, /\$inspectorCommand\s*=/u);
+});
+
 test("repository gates ignore the isolated powerpack runtime", () => {
   const eslintConfig = readFileSync(resolve(root, "eslint.config.js"), "utf8");
   const prettierIgnore = readFileSync(resolve(root, ".prettierignore"), "utf8");
