@@ -3,7 +3,7 @@
 Checked 2026-08-09. Evidence is from real commands; skipped checks are not counted as passing.
 
 | Level | Check                                           | Result                         | Evidence                                                                       |
-| ----- | ----------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------ |
+| ----- | ----------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------ |
 | 1     | Required files, JSON, paths, tool metadata, CSP | PASS                           | `PLUGIN_CONTRACT_VALID tools=7 paths=ok csp=narrow app_id=absent`              |
 | 2     | TypeScript typecheck                            | PASS                           | Server and web `tsc --noEmit` exited 0                                         |
 | 2     | Lint and format                                 | PASS                           | ESLint exited 0; Prettier check matched all files                              |
