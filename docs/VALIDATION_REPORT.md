@@ -26,13 +26,14 @@ Checked 2026-08-09. Evidence is from real commands; skipped checks are not count
 
 ## Crucible catalog extension
 
-`node scripts/validate-crucible-catalog.mjs` — PASS (2 batches, 40 pinned
+`node scripts/validate-crucible-catalog.mjs` — PASS (3 batches, 60 pinned
 entries; batch 1 low=9 medium=5 high=5 critical=1, batch 2 low=11 medium=6
-high=2 critical=1). The catalog unit test passes and enforces the authority
-mapping per batch: low is workspace-safe, medium/high require an authorized
-Crucible scope, and critical is Crucible-only. Batch 2's 20 candidates were
-re-verified live: `PyCQA/bandit`, `github/codeql`, `ServiceNow/BrowserGym`,
-`anchore/grant`, `google/osv-scalibr`, `securego/gosec`, `Yelp/detect-secrets`,
+high=2 critical=1, batch 3 low=16 medium=2 high=1 critical=1). The catalog
+unit test passes and enforces the authority mapping per batch: low is
+workspace-safe, medium/high require an authorized Crucible scope, and critical
+is Crucible-only. Batch 2's 20 candidates were re-verified live: `PyCQA/bandit`,
+`github/codeql`, `ServiceNow/BrowserGym`, `anchore/grant`,
+`google/osv-scalibr`, `securego/gosec`, `Yelp/detect-secrets`,
 `sigstore/cosign`, `in-toto/in-toto`, `open-policy-agent/opa`,
 `CycloneDX/cyclonedx-cli`, `sherlock-project/sherlock`, `falcosecurity/falco`,
 `owasp-amass/amass`, `google/honggfuzz`, `NVIDIA/garak`, `Azure/PyRIT`,
@@ -42,6 +43,29 @@ the GitHub API; license text was read directly (not just GitHub's SPDX
 classifier) for `owasp-amass/amass`, `anchore/grant`, `in-toto/in-toto`, and
 `ServiceNow/BrowserGym`, whose classifier reported `NOASSERTION` despite
 carrying genuine Apache-2.0 license text.
+
+Batch 3's 20 candidates were likewise re-verified live:
+`NationalSecurityAgency/ghidra`, `mandiant/capa`, `mandiant/flare-floss`,
+`VirusTotal/yara`, `skylot/jadx`, `androguard/androguard`, `avast/retdec`,
+`angr/angr`, `lief-project/LIEF`, `capstone-engine/capstone`,
+`binref/refinery`, `horsicq/Detect-It-Easy`, `google/binexport`,
+`plyara/plyara`, `gchq/CyberChef`, `struppigel/PortEx`,
+`mandiant/stringsifter`, `hasherezade/pe-sieve`, `google/syzkaller`,
+`frida/frida` — 20/20 exact repository HEADs and license SHA-256 values
+confirmed online. License text was read directly for `capstone-engine/capstone`
+(`license: None` from the classifier; confirmed BSD-3-Clause in
+`LICENSES/LICENSE.TXT`), `binref/refinery` (`NOASSERTION`; confirmed
+BSD-3-Clause), and `frida/frida` (`NOASSERTION`; confirmed wxWindows Library
+Licence 3.1, an LGPL-derived permissive-for-linking license). Eight
+originally-considered candidates were confirmed copyleft-licensed and excluded:
+MobSF (GPL-3.0), Keystone (GPL-2.0), Unicorn (GPL-2.0), radare2 (classifier
+`NOASSERTION`; confirmed LGPLv3-with-GPL-plugins in `COPYING.md`), rizin
+(LGPL-3.0), Cutter (GPL-3.0), Qiling (GPL-2.0), and objection (GPL-3.0). Two
+further candidates (`x64dbg`, whose classifier returned `NOASSERTION` and was
+not independently re-verified by reading its license file, and
+`eliben/pyelftools`, genuinely Public Domain/Unlicense but outside this
+batch's chosen license set) were left out rather than included on an
+unverified or out-of-policy basis.
 | 5 | Secret/static security scan | PASS | Verification script exited without findings |
 | 5 | Managed deep repository scan | BLOCKED BY EXTERNAL DEPENDENCY | Scanner host lacks required filesystem permission profile after three attempts |
 | 6 | ChatGPT developer-mode connection | BLOCKED BY EXTERNAL DEPENDENCY | Production resource is 404; no OAuth registration or real app ID |

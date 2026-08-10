@@ -9,6 +9,8 @@ test("Crucible catalog batches each contain all risk tiers and strict authority 
   );
   assert.equal(catalog.schemaVersion, 2);
   assert.ok(Array.isArray(catalog.batches) && catalog.batches.length >= 1);
+  const routePrefixes = catalog.policy?.routePrefixes ?? ["echo.crucible."];
+  assert.ok(routePrefixes.length > 0, "policy.routePrefixes must be non-empty");
 
   const seenIds = new Set();
   const seenRepos = new Set();
@@ -23,7 +25,10 @@ test("Crucible catalog batches each contain all risk tiers and strict authority 
       if (tool.riskTier === "critical") assert.equal(tool.authority, "crucible-only");
       if (tool.riskTier === "high") assert.notEqual(tool.authority, "workspace-safe");
       if (tool.riskTier === "low") assert.equal(tool.authority, "workspace-safe");
-      assert.match(tool.crucibleRoute, /^echo\.(crucible|ai_redteam)\./u);
+      assert.ok(
+        routePrefixes.some((prefix) => tool.crucibleRoute?.startsWith(prefix)),
+        `${tool.id}: crucibleRoute ${tool.crucibleRoute} does not match any policy.routePrefixes entry`,
+      );
       assert.ok(!seenIds.has(tool.id), `duplicate id across batches: ${tool.id}`);
       seenIds.add(tool.id);
       assert.ok(

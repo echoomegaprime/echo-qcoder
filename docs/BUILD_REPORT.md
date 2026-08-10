@@ -9,17 +9,24 @@ Built QCoder as a governed local Qwen Code builder plus a private-use full-bundl
 The 0.3.0 capability powerpack pins 21 permissively licensed upstream repositories by exact Git commit and license digest. Qwen Code 0.21.8, Serena 1.6.1, ast-grep 0.45.1, and mini-SWE-agent 2.4.6 are installed; Serena is connected through an untrusted 16-tool semantic/refactor allowlist. Promptfoo remains reference-only after its 0.122.0 dependency tree failed the high-severity audit gate and was removed.
 
 The release also adds `config/crucible-tool-catalog.json`, a separately validated
-catalog now covering two reviewed batches of 20 repositories each (40 total),
+catalog now covering three reviewed batches of 20 repositories each (60 total),
 every batch independently spanning low, medium, high, and critical risk tiers.
-The catalog pins commits and license digests and maps every entry to a Crucible
-or AI-red-team route. Batch 2 re-verified all 20 originally proposed candidates
+The catalog pins commits and license digests and maps every entry to a Crucible,
+AI-red-team, reverse-engineering, mobile-instrumentation, or Prometheus
+strike-team route. Batch 2 re-verified all 20 originally proposed candidates
 live against GitHub; 12 (Nmap, Masscan, Nikto, SQLMap, theHarvester, Recon-ng,
 Zeek, Suricata, Wazuh, Velociraptor, Semgrep, TruffleHog) carried a
 non-permissive or unverifiable license and were replaced with equivalent
 permissively-licensed tooling, including the catalog's first two generative-AI
-red-teaming entries (Garak, PyRIT). It is an integration catalog, not a claim
-that all 40 binaries are installed; active, fuzzing, or adversary-emulation
-tools remain Crucible-scoped.
+red-teaming entries (Garak, PyRIT). Batch 3 adds reverse-engineering and
+binary-analysis tooling (Ghidra, capa, FLOSS, YARA, jadx, Androguard, RetDec,
+LIEF, Capstone, angr, syzkaller, Frida, and eight more) matching the tool
+families named in `FLEET_ROLES/reverse-engineer.md`; it required extending
+`policy.allowedLicenses` to recognize verified BSD-3-Clause, BSD-2-Clause, and
+(Frida-only) wxWindows-3.1 license text that GitHub's classifier mis-tagged or
+left unrecognized. It is an integration catalog, not a claim that all 60
+binaries are installed; active, fuzzing, live-instrumentation, or
+adversary-emulation tools remain Crucible-scoped.
 
 The original 8K Ollama tag could not fit Qwen 0.21.8's initialized agent, skill, and tool contract. A separate, reproducible `c3po-code:qcoder-32k` tag now preserves the source model while providing a 32,768-token operational context. A live headless adapter response returned the exact expected text, used 27,270 total tokens without truncation, and reported the full 18.64 GB model resident in VRAM; both 16 GB GPUs showed active allocation.
 

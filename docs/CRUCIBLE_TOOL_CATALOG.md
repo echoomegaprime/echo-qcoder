@@ -40,6 +40,39 @@ call a live model endpoint rather than a network target, so their route lives in
 the dedicated `echo.ai_redteam.*` namespace rather than `echo.crucible.*`; the
 policy's `routePrefixes` list and the validator accept both prefixes.
 
+## Batch 3 (20 entries)
+
+Reverse-engineering and binary-analysis tooling, added at Commander direction to
+cover the tool families named in `FLEET_ROLES/reverse-engineer.md`
+(`echo.re.binary.*`, `echo.re.apk.*`, and their Ghidra/capa/FLOSS/YARA/Frida
+companions). Candidates with a copyleft license (Nikto-family exclusions apply
+here too: MobSF, Keystone, Unicorn, rizin, Cutter, Qiling, x64dbg, radare2,
+objection) were excluded after live verification.
+
+- **Low** (workspace-safe, static/local): Ghidra, capa, FLOSS, YARA, jadx,
+  Androguard, RetDec, LIEF, Capstone, Refinery, Detect It Easy, BinExport,
+  plyara, CyberChef, PortEx, StringSifter.
+- **Medium** (crucible-scope-required, bounded/live): angr, pe-sieve.
+- **High** (crucible-scope-required, active): syzkaller.
+- **Critical** (crucible-only): Frida — cataloged for capability discovery
+  only, the same posture as Caldera (batch 1) and Open Interpreter (batch 2).
+  Frida grants live, cross-platform, system-wide code injection into any
+  running process, the same open-ended blast radius as those two entries.
+
+Batch 3 required two policy extensions, both documented in
+`config/crucible-tool-catalog.json`'s `policy.note`:
+
+- `allowedLicenses` gained `BSD-3-Clause` and `BSD-2-Clause` (Capstone, YARA,
+  angr, Refinery, and pe-sieve all carry genuinely permissive BSD text, but
+  GitHub's SPDX classifier reported `NOASSERTION` or `None` for several of
+  them — confirmed by reading the actual LICENSE file, not the classifier) and
+  `wxWindows-3.1` (Frida only — an LGPL-derived license with an explicit
+  linking exception, kept practically permissive for this catalog's
+  pinned-source-only, no-redistribution-of-binaries use).
+- `routePrefixes` gained `echo.re.`, `echo.mobile_pentest.`, and
+  `echo.prometheus_strike.` — real, live-verified ECHO namespaces that batch
+  1/2's tooling never touched.
+
 ## Risk and authority
 
 - **Low** tools are static analysis, inventory, SBOM, dependency, or policy
@@ -66,6 +99,6 @@ npm run test:powerpack
 node .\scripts\validate-crucible-catalog.mjs
 ```
 
-The next expansion batch (batch 3) should be proposed only after batch 2's
+The next expansion batch (batch 4) should be proposed only after batch 3's
 entries have been installed or explicitly marked unavailable by a live Crucible
 inventory check.
