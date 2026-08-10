@@ -26,10 +26,22 @@ Checked 2026-08-09. Evidence is from real commands; skipped checks are not count
 
 ## Crucible catalog extension
 
-`node scripts/validate-crucible-catalog.mjs` — PASS (`20` pinned entries;
-low=9, medium=5, high=5, critical=1). The catalog unit test passes and enforces
-the authority mapping: low is workspace-safe, medium/high require an authorized
-Crucible scope, and critical is Crucible-only.
+`node scripts/validate-crucible-catalog.mjs` — PASS (2 batches, 40 pinned
+entries; batch 1 low=9 medium=5 high=5 critical=1, batch 2 low=11 medium=6
+high=2 critical=1). The catalog unit test passes and enforces the authority
+mapping per batch: low is workspace-safe, medium/high require an authorized
+Crucible scope, and critical is Crucible-only. Batch 2's 20 candidates were
+re-verified live: `PyCQA/bandit`, `github/codeql`, `ServiceNow/BrowserGym`,
+`anchore/grant`, `google/osv-scalibr`, `securego/gosec`, `Yelp/detect-secrets`,
+`sigstore/cosign`, `in-toto/in-toto`, `open-policy-agent/opa`,
+`CycloneDX/cyclonedx-cli`, `sherlock-project/sherlock`, `falcosecurity/falco`,
+`owasp-amass/amass`, `google/honggfuzz`, `NVIDIA/garak`, `Azure/PyRIT`,
+`OJ/gobuster`, `projectdiscovery/nuclei`, `OpenInterpreter/open-interpreter` —
+20/20 exact repository HEADs and license SHA-256 values confirmed online via
+the GitHub API; license text was read directly (not just GitHub's SPDX
+classifier) for `owasp-amass/amass`, `anchore/grant`, `in-toto/in-toto`, and
+`ServiceNow/BrowserGym`, whose classifier reported `NOASSERTION` despite
+carrying genuine Apache-2.0 license text.
 | 5 | Secret/static security scan | PASS | Verification script exited without findings |
 | 5 | Managed deep repository scan | BLOCKED BY EXTERNAL DEPENDENCY | Scanner host lacks required filesystem permission profile after three attempts |
 | 6 | ChatGPT developer-mode connection | BLOCKED BY EXTERNAL DEPENDENCY | Production resource is 404; no OAuth registration or real app ID |
