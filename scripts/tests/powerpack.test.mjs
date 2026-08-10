@@ -103,8 +103,8 @@ test("FORGE model provisioning creates a bounded 32K derivative without replacin
     "utf8",
   );
   assert.match(provisioning, /source_model=.*c3po-code:latest/u);
-  assert.match(provisioning, /target_model=.*c3po-code:qcoder-32k/u);
-  assert.match(provisioning, /context_length=.*32768/u);
+  assert.match(provisioning, /target_model=.*c3po-code:qcoder-128k/u);
+  assert.match(provisioning, /context_length=.*131072/u);
   assert.match(provisioning, /ollama show --modelfile/u);
   assert.match(provisioning, /ollama create/u);
   assert.match(provisioning, /actual_context/u);

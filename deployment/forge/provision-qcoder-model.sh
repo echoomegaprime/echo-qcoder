@@ -3,8 +3,8 @@ set -Eeuo pipefail
 
 container=${OLLAMA_CONTAINER:-echo-ollama}
 source_model=${QCODER_SOURCE_MODEL:-c3po-code:latest}
-target_model=${QCODER_MODEL:-c3po-code:qcoder-32k}
-context_length=${QCODER_CONTEXT_LENGTH:-32768}
+target_model=${QCODER_MODEL:-c3po-code:qcoder-128k}
+context_length=${QCODER_CONTEXT_LENGTH:-131072}
 
 if [[ ! "$container" =~ ^[A-Za-z0-9_.-]+$ ]]; then
   printf 'invalid Ollama container name\n' >&2
@@ -14,7 +14,7 @@ if [[ ! "$source_model" =~ ^[A-Za-z0-9_.:/-]+$ || ! "$target_model" =~ ^[A-Za-z0
   printf 'invalid Ollama model name\n' >&2
   exit 21
 fi
-if [[ ! "$context_length" =~ ^[0-9]+$ ]] || ((context_length < 16384 || context_length > 65536)); then
+if [[ ! "$context_length" =~ ^[0-9]+$ ]] || ((context_length < 16384 || context_length > 262144)); then
   printf 'QCODER_CONTEXT_LENGTH must be between 16384 and 65536\n' >&2
   exit 22
 fi

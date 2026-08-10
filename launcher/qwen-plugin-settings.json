@@ -26,19 +26,19 @@
     "allowed": []
   },
   "model": {
-    "name": "c3po-code:qcoder-64k"
+    "name": "c3po-code:qcoder-128k"
   },
   "modelProviders": {
     "openai": [
       {
-        "id": "c3po-code:qcoder-64k",
+        "id": "c3po-code:qcoder-128k",
         "name": "FORGE local uncensored Qwen 3.6 27B (64K QCoder context)",
         "baseUrl": "http://192.168.1.220:11434/v1",
         "envKey": "QCODER_LOCAL_API_KEY",
         "generationConfig": {
           "timeout": 900000,
           "maxRetries": 1,
-          "contextWindowSize": 65536,
+          "contextWindowSize": 131072,
           "samplingParams": {
             "temperature": 0.2,
             "top_p": 0.8,

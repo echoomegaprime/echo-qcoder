@@ -1,0 +1,206 @@
+{
+  "$version": 4,
+  "context": {
+    "fileName": [
+      "QWEN.md",
+      "AGENTS.md",
+      "CLAUDE.md"
+    ]
+  },
+  "general": {
+    "checkpointing": {
+      "enabled": true
+    }
+  },
+  "experimental": {
+    "todoStopGuard": true,
+    "agentTeam": false
+  },
+  "mcp": {
+    "allowed": [
+      "echo-cluster-ops",
+      "echo-memory",
+      "echo-queue",
+      "echo-sovereign",
+      "echo-telegram",
+      "echo-vault",
+      "local-llm",
+      "mega-gateway",
+      "qcoder-serena",
+      "shadowglass"
+    ]
+  },
+  "mcpServers": {
+    "qcoder-serena": {
+      "command": "serena",
+      "args": [
+        "start-mcp-server",
+        "--context",
+        "codex",
+        "--project-from-cwd",
+        "--enable-web-dashboard",
+        "false",
+        "--open-web-dashboard",
+        "false",
+        "--tool-timeout",
+        "120"
+      ],
+      "timeout": 120000,
+      "trust": false,
+      "description": "Pinned Serena semantic navigation and symbolic refactoring for the active QCoder workspace.",
+      "includeTools": [
+        "initial_instructions",
+        "activate_project",
+        "get_current_config",
+        "onboarding",
+        "get_symbols_overview",
+        "find_symbol",
+        "find_referencing_symbols",
+        "find_implementations",
+        "find_declaration",
+        "get_diagnostics_for_file",
+        "search_for_pattern",
+        "replace_symbol_body",
+        "insert_after_symbol",
+        "insert_before_symbol",
+        "rename_symbol",
+        "safe_delete_symbol"
+      ],
+      "excludeTools": [
+        "execute_shell_command",
+        "read_file",
+        "create_text_file",
+        "replace_content",
+        "replace_in_files",
+        "write_memory",
+        "read_memory",
+        "list_memories",
+        "delete_memory",
+        "rename_memory",
+        "edit_memory"
+      ]
+    },
+    "echo-sovereign": {
+      "command": "node",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\echo-sovereign\\dist\\server.js"
+      ],
+      "env": {
+        "SOVEREIGN_KEY": "${ECHO_SOVEREIGN_KEY}",
+        "HMAC_SECRET": "${ECHO_VAULT_HMAC_SECRET}",
+        "SDK_GATE": "https://forge.echo-op.com",
+        "CLAUDE_AGENT_KIND": "claude_code"
+      }
+    },
+    "shadowglass": {
+      "command": "python",
+      "args": [
+        "C:\\ECHO_OMEGA_PRIME\\SYSTEMS\\shadowglass_master\\mcp_server.py"
+      ],
+      "env": {
+        "FORGE_BASE": "http://forge-2:8000"
+      }
+    },
+    "echo-memory": {
+      "command": "python",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\echo-memory\\server.py"
+      ],
+      "env": {
+        "ECHO_SOVEREIGN_KEY": "${ECHO_SOVEREIGN_KEY}",
+        "BRAIN_INSTANCE_ID": "claude_code_hammer"
+      }
+    },
+    "echo-queue": {
+      "command": "python",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\echo-queue\\server.py"
+      ],
+      "env": {
+        "ECHO_SOVEREIGN_KEY": "${ECHO_SOVEREIGN_KEY}",
+        "ECHO_SEAT": "claude_code_hammer"
+      }
+    },
+    "local-llm": {
+      "command": "python",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\local-llm\\server.py"
+      ],
+      "env": {}
+    },
+    "echo-vault": {
+      "command": "python",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\echo-vault\\server.py"
+      ],
+      "env": {
+        "ECHO_SOVEREIGN_KEY": "${ECHO_SOVEREIGN_KEY}",
+        "ECHO_VAULT_HMAC_SECRET": "${ECHO_VAULT_HMAC_SECRET}"
+      }
+    },
+    "echo-cluster-ops": {
+      "command": "python",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\echo-cluster-ops\\server.py"
+      ],
+      "env": {
+        "ECHO_SOVEREIGN_KEY": "${ECHO_SOVEREIGN_KEY}",
+        "ECHO_VAULT_HMAC_SECRET": "${ECHO_VAULT_HMAC_SECRET}"
+      }
+    },
+    "echo-telegram": {
+      "command": "python",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\echo-telegram\\server.py"
+      ],
+      "env": {
+        "ECHO_TG_SID": "claude_code_hammer",
+        "FORGE_SSH": "forge",
+        "ECHO_TG_CHAT_ID": "8890692789"
+      }
+    },
+    "mega-gateway": {
+      "command": "node",
+      "args": [
+        "C:\\ECHO_MCP\\servers\\mega-gateway-mcp\\server.js"
+      ],
+      "env": {
+        "ECHO_SDK_GATE": "http://192.168.1.220:8000",
+        "ECHO_SOVEREIGN_KEY": "${ECHO_SOVEREIGN_KEY}"
+      }
+    }
+  },
+  "security": {
+    "auth": {
+      "selectedType": "openai"
+    }
+  },
+  "tools": {
+    "shell": {
+      "enableInteractiveShell": false
+    }
+  },
+  "model": {
+    "name": "c3po-code:qcoder-128k"
+  },
+  "modelProviders": {
+    "openai": [
+      {
+        "id": "c3po-code:qcoder-128k",
+        "name": "FORGE local uncensored Qwen 3.6 27B (128K QCoder context)",
+        "baseUrl": "http://192.168.1.220:11434/v1",
+        "envKey": "QCODER_LOCAL_API_KEY",
+        "generationConfig": {
+          "timeout": 900000,
+          "maxRetries": 1,
+          "contextWindowSize": 131072,
+          "samplingParams": {
+            "temperature": 0.2,
+            "top_p": 0.8,
+            "max_tokens": 4096
+          }
+        }
+      }
+    ]
+  }
+}
