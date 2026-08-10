@@ -20,6 +20,7 @@ Get-ChildItem -LiteralPath $root -Recurse -File -Include *.json | Where-Object {
 & npm run build; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & node .\scripts\validate-plugin.mjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & node .\scripts\validate-powerpack.mjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& node .\scripts\validate-crucible-catalog.mjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & python .\launcher\tests\test_qcoder_adapter.py; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & npm audit --audit-level=high; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & npm audit --prefix .\scripts\inspector --audit-level=high; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

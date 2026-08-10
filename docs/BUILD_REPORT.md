@@ -8,6 +8,12 @@ Built QCoder as a governed local Qwen Code builder plus a private-use full-bundl
 
 The 0.3.0 capability powerpack pins 21 permissively licensed upstream repositories by exact Git commit and license digest. Qwen Code 0.21.8, Serena 1.6.1, ast-grep 0.45.1, and mini-SWE-agent 2.4.6 are installed; Serena is connected through an untrusted 16-tool semantic/refactor allowlist. Promptfoo remains reference-only after its 0.122.0 dependency tree failed the high-severity audit gate and was removed.
 
+The release also adds `config/crucible-tool-catalog.json`, a separately validated
+20-repository catalog covering low, medium, high, and critical risk tiers. The
+catalog pins commits and license digests and maps every entry to a Crucible route.
+It is an integration catalog, not a claim that all 20 binaries are installed;
+active or adversary-emulation tools remain Crucible-scoped.
+
 The original 8K Ollama tag could not fit Qwen 0.21.8's initialized agent, skill, and tool contract. A separate, reproducible `c3po-code:qcoder-32k` tag now preserves the source model while providing a 32,768-token operational context. A live headless adapter response returned the exact expected text, used 27,270 total tokens without truncation, and reported the full 18.64 GB model resident in VRAM; both 16 GB GPUs showed active allocation.
 
 Continuous maintenance is now real rather than aspirational: a fail-closed autonomy tick is defined every six hours, reconciles one persistent GitHub issue on failures/recovery, and is paired with weekly Dependabot checks. GitHub accepted a manual dispatch but refused to allocate any hosted runner because the account is locked by a billing issue. A limited HAMMER Scheduled Task now runs the identical gate every six hours; its immediate execution completed with result `0`, all four gates green, and the next repetition interval verified as `PT6H`.

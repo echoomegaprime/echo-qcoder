@@ -18,6 +18,11 @@ Additional fixes include per-action and global quotas, request-size limits, serv
 - CSP/static manifest validation: narrow CSP, seven unique tools, all manifest paths resolved.
 - Powerpack supply-chain gate: 21 repositories have exact Git commit pins, permissive-license allowlisting, and pinned license digests; online HEAD and license revalidation passed.
 - Promptfoo 0.122.0 was removed after its installed tree reported six high and three moderate npm advisories. The remaining local powerpack audit reports zero vulnerabilities.
+
+- The Crucible extension is catalog-only by default. Active scanners, fuzzers,
+  out-of-band interaction tooling, and adversary emulation are never granted a
+  general QCoder shell path. Risk/authority validation fails closed, and Caldera
+  is marked critical/Crucible-only.
 - Serena is untrusted and constrained to an explicit semantic/refactor tool allowlist; shell, raw file, and memory tools are excluded from Qwen's profile.
 - Public-source hardening removed generated Python bytecode from Git tracking while preserving local runtime files. The six-hour workflow has only read-content and issue-write permissions; it cannot push, merge, release, deploy, or read repository secrets.
 - The HAMMER fallback task runs with the current interactive identity at `RunLevel Limited`, ignores overlapping runs, has a 30-minute execution limit, stores only sanitized local evidence, and posts only failed gate names to the public issue.

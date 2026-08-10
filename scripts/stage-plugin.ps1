@@ -105,6 +105,7 @@ $requiredRuntimePaths = @(
     'launcher/qwen-plugin-settings.json',
     '.serena/project.yml',
     'config/qcoder-powerpack.json',
+    'config/crucible-tool-catalog.json',
     'server/dist/index.js',
     'web/dist/index.html'
 )
