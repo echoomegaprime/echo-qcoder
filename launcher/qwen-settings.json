@@ -71,6 +71,11 @@
       "selectedType": "openai"
     }
   },
+  "tools": {
+    "shell": {
+      "enableInteractiveShell": false
+    }
+  },
   "model": {
     "name": "c3po-code:qcoder-64k"
   },

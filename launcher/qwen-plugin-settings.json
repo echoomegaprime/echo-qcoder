@@ -17,6 +17,11 @@
     "allow": ["Read", "Edit"],
     "deny": ["Bash", "WebFetch", "Agent"]
   },
+  "tools": {
+    "shell": {
+      "enableInteractiveShell": false
+    }
+  },
   "mcp": {
     "allowed": []
   },
