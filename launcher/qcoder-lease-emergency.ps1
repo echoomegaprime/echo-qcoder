@@ -1,4 +1,4 @@
-# QCoder lease emergency recover (no secrets)
+﻿# QCoder lease emergency recover (no secrets)
 $ErrorActionPreference = "Continue"
 $root = "C:\ECHO_MCP\echo-qcoder"
 $paths = @(
