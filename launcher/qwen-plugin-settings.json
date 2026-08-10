@@ -1,0 +1,46 @@
+{
+  "$version": 4,
+  "context": {
+    "fileName": ["AGENTS.md", "CLAUDE.md"]
+  },
+  "general": {
+    "checkpointing": {
+      "enabled": true
+    }
+  },
+  "security": {
+    "auth": {
+      "selectedType": "openai"
+    }
+  },
+  "permissions": {
+    "allow": ["Read", "Edit"],
+    "deny": ["Bash", "WebFetch", "Agent"]
+  },
+  "mcp": {
+    "allowed": []
+  },
+  "model": {
+    "name": "c3po-code:qcoder-32k"
+  },
+  "modelProviders": {
+    "openai": [
+      {
+        "id": "c3po-code:qcoder-32k",
+        "name": "FORGE local uncensored Qwen 3.6 27B (32K QCoder context)",
+        "baseUrl": "http://192.168.1.220:11434/v1",
+        "envKey": "QCODER_LOCAL_API_KEY",
+        "generationConfig": {
+          "timeout": 900000,
+          "maxRetries": 1,
+          "contextWindowSize": 32768,
+          "samplingParams": {
+            "temperature": 0.2,
+            "top_p": 0.8,
+            "max_tokens": 2048
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 180" role="img" aria-labelledby="title">
+  <title id="title">ECHO QCoder Console</title>
+  <rect width="720" height="180" rx="28" fill="#030807"/>
+  <g transform="translate(28 26)"><path d="M30 15 8 64l22 49M98 15l22 49-22 49" fill="none" stroke="#2dd4bf" stroke-width="10" stroke-linecap="round"/><path d="M45 79c5 7 12 10 20 10 15 0 27-11 27-25S80 39 65 39 38 50 38 64c0 4 1 8 3 12" fill="none" stroke="#d9fbf5" stroke-width="9" stroke-linecap="round"/><path d="m69 78 18 17" stroke="#2dd4bf" stroke-width="9" stroke-linecap="round"/></g>
+  <text x="178" y="80" fill="#d9fbf5" font-family="Inter,Arial,sans-serif" font-size="52" font-weight="700" letter-spacing="-2">QCoder Console</text>
+  <text x="181" y="119" fill="#5eead4" font-family="Consolas,monospace" font-size="18" letter-spacing="4">GOVERNED LOCAL BUILDER</text>
+</svg>

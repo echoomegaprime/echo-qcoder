@@ -1,0 +1,70 @@
+name: QCoder Autonomy Tick
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: qcoder-autonomy-tick
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        shell: pwsh
+        run: |
+          npm ci --ignore-scripts
+          npm ci --prefix scripts/inspector --ignore-scripts
+      - name: Run upstream, security, and regression tick
+        id: tick
+        continue-on-error: true
+        shell: pwsh
+        run: node ./scripts/autonomy-tick.mjs --output artifacts/qcoder-autonomy-report.json
+      - name: Reconcile autonomy issue
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TICK_OUTCOME: ${{ steps.tick.outcome }}
+        run: |
+          $title = 'QCoder autonomy tick needs attention'
+          $issues = gh issue list --repo $env:GITHUB_REPOSITORY --state open --search "`"$title`" in:title" --limit 1 --json number | ConvertFrom-Json
+          $runUrl = "$env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"
+          if ($env:TICK_OUTCOME -eq 'failure') {
+            $report = Get-Content -LiteralPath 'artifacts/qcoder-autonomy-report.json' -Raw | ConvertFrom-Json
+            $failed = $report.failed -join ', '
+            $body = "Scheduled QCoder autonomy tick failed. Failed gates: $failed. Run: $runUrl. The sanitized report is retained as the workflow artifact."
+            if ($issues.Count -gt 0) {
+              gh issue comment $issues[0].number --repo $env:GITHUB_REPOSITORY --body $body
+            } else {
+              gh issue create --repo $env:GITHUB_REPOSITORY --title $title --body $body
+            }
+          } elseif ($issues.Count -gt 0) {
+            gh issue comment $issues[0].number --repo $env:GITHUB_REPOSITORY --body "Autonomy tick recovered. Run: $runUrl"
+            gh issue close $issues[0].number --repo $env:GITHUB_REPOSITORY --reason completed
+          }
+      - name: Upload autonomy evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qcoder-autonomy-report
+          path: artifacts/qcoder-autonomy-report.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve failed gate status
+        if: steps.tick.outcome == 'failure'
+        shell: pwsh
+        run: exit 1
