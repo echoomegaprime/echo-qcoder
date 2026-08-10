@@ -36,3 +36,4 @@ artifacts/
 Thumbs.db
 .idea/
 .vscode/
+.bundle
