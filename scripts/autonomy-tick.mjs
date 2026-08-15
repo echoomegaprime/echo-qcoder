@@ -111,7 +111,7 @@ function main() {
   const summary = {
     schemaVersion: 1,
     checkedAt: new Date().toISOString(),
-    repository: "ECHO-OMEGA-PRIME/echo-qcoder",
+    repository: "echoomegaprime/echo-qcoder",
     ...summarizeChecks(checks),
   };
   mkdirSync(dirname(options.output), { recursive: true });
