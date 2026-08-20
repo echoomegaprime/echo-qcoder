@@ -1,0 +1,35 @@
+[Unit]
+Description=Fail-closed FORGE-local Qwen 27B 128K route
+After=network-online.target docker.service echo-qwen-home.service
+Wants=network-online.target
+Requires=echo-qwen-home.service
+
+[Service]
+Type=simple
+User=forge
+Group=forge
+WorkingDirectory=/home/forge/services/qwen-route/current
+EnvironmentFile=/etc/echo/qwen-route.env
+ExecStartPre=/usr/bin/python3 /home/forge/services/qwen-route/current/qwen-warmup.py
+ExecStart=/usr/bin/python3 -m uvicorn app:app --host 127.0.0.1 --port 11437 --workers 1 --no-access-log
+Restart=always
+RestartSec=5s
+TimeoutStartSec=1800s
+TimeoutStopSec=30s
+KillSignal=SIGINT
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/forge/services/qwen-route
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryHigh=768M
+MemoryMax=1G
+TasksMax=128
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=echo-qwen-route
+
+[Install]
+WantedBy=multi-user.target

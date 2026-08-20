@@ -2,6 +2,8 @@
 
 Generated 2026-08-09.
 
+> Superseded runtime note (2026-08-20): the 32K deployment evidence below is retained as historical provenance. The active launcher and registry contract now select only `c3po-code:echo-abliterated-128k` through the governed FORGE port 11437 route documented in [FORGE Qwen route](FORGE_QWEN_ROUTE.md); no active caller selects the former 32K/64K aliases.
+
 ## Result
 
 Built QCoder as a governed local Qwen Code builder plus a private-use full-bundle ChatGPT/Codex plugin in a public source repository. The runtime uses Qwen Code 0.21.8 and the verified FORGE-hosted 27B abliterated model across two GPUs with CPU-offload headroom. The plugin supplies one focused controller skill, seven user-goal MCP tools, a versioned MCP Apps console, OAuth authorization contracts, local marketplace support, deterministic PowerShell automation, CI, tests, and release documentation. Eight Qwen-native skills cover governed coding, semantic navigation, autonomous issue solving, self-evaluation, authorized security, browser research, vision, and audio/voice routing.

@@ -11,8 +11,8 @@ from pathlib import Path
 from typing import NamedTuple, Sequence
 
 
-DEFAULT_MODEL = "c3po-code:qcoder-64k"
-DEFAULT_BASE_URL = "http://192.168.1.220:11434/v1"
+DEFAULT_MODEL = "c3po-code:echo-abliterated-128k"
+DEFAULT_BASE_URL = "http://192.168.1.220:11437/v1"
 DEFAULT_API_KEY = "local-qcoder"
 
 

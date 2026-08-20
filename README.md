@@ -1,6 +1,6 @@
 # Echo QCoder
 
-Echo QCoder is ECHO's governed, zero-metered builder backed by the FORGE-hosted `huihui_ai/Qwen3.6-abliterated:27b` model. The `qcoder` PowerShell alias launches Qwen Code 0.21.8 with the repository's `AGENTS.md` and `CLAUDE.md`, a durable SOL mission, role-scoped broker access, a 32K context profile, and a verified dual-GPU lease.
+Echo QCoder is ECHO's governed, zero-metered builder backed by the FORGE-hosted `huihui_ai/Qwen3.6-abliterated:27b` model. The `qcoder` PowerShell alias launches Qwen Code 0.21.8 with the repository's `AGENTS.md` and `CLAUDE.md`, a durable SOL mission, role-scoped broker access, the stable `c3po-code:echo-abliterated-128k` profile, and a verified dual-GPU lease. The private raw Ollama listener remains on FORGE loopback `127.0.0.1:11436`; all callers use the fail-closed route on `127.0.0.1:11437` (LAN `192.168.1.220:11437`).
 
 This public source repository also packages QCoder Console, a private-use full-bundle ChatGPT/Codex plugin with one focused skill, seven MCP tools, and an accessible MCP Apps console. It starts, inspects, steers, and stops named builder sessions without exposing raw shell, arbitrary paths, process IDs, or credentials. Publishing the source does not publish ECHO's OAuth authority, private model endpoint, credentials, registered workspaces, or ChatGPT connection.
 

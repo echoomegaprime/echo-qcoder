@@ -4,7 +4,7 @@ Checked: 2026-08-09 (America/Chicago)
 
 ## Outcome
 
-QCoder now launches directly as a governed `cli-build` agent on Qwen Code 0.21.8 and ships eight focused Qwen skills. A bounded Serena MCP gives it symbol navigation, reference graphs, diagnostics, and symbolic refactoring across TypeScript, Python, and PowerShell. Local ast-grep adds structural search, mini-SWE-agent supplies an independently invoked issue-to-patch reference loop, and QCoder's deterministic golden evaluator remains the release gate. The production QCoder model tag uses a verified 32K context window so the full agent/skill/tool contract fits without truncation.
+QCoder launches directly as a governed `cli-build` agent on Qwen Code 0.21.8 and ships eight focused Qwen skills. A bounded Serena MCP gives it symbol navigation, reference graphs, diagnostics, and symbolic refactoring across TypeScript, Python, and PowerShell. Local ast-grep adds structural search, mini-SWE-agent supplies an independently invoked issue-to-patch reference loop, and QCoder's deterministic golden evaluator remains the release gate. The production model uses the single stable `c3po-code:echo-abliterated-128k` alias behind the fail-closed FORGE route; former 32K and 64K aliases are historical and are not selected by launchers or registry entries.
 
 Install or refresh the full local powerpack:
 
@@ -55,7 +55,7 @@ The installer validates the pinned manifest first, uses exact package versions, 
 
 ## Runtime boundaries
 
-The active `huihui_ai/Qwen3.6-abliterated:27b` runtime is exposed to QCoder as `c3po-code:qcoder-32k` and holds the FORGE two-GPU coding lease. The derivative preserves `c3po-code:latest`, changes only the context parameter, and is reproducible with `deployment/forge/provision-qcoder-model.sh`. Live verification showed a 32,768-token context and full 18.64 GB model residency across the two 16 GB GPUs. Vision, OCR, hearing, voice, and security scanners remain services or separately authorized sidecars. The ChatGPT plugin continues to use `qwen-plugin-settings.json`, where MCP, shell, web fetch, and sub-agent spawning are denied; only direct local QCoder sessions receive the bounded Serena profile in `qwen-settings.json`.
+The active `huihui_ai/Qwen3.6-abliterated:27b` runtime is exposed to QCoder as `c3po-code:echo-abliterated-128k` and holds the FORGE two-GPU coding lease. The derivative is reproducible with `deployment/forge/provision-qcoder-model.sh`, pins `num_ctx` to 131,072, and refuses a source-digest mismatch. Raw Ollama remains loopback-only on port 11436; launcher traffic reaches the audited gateway on port 11437. The gateway requires exact digest, model, context, container health, and full two-GPU residency; performs authoritative no-truncate/no-shift token preflight; and enforces one active request plus a bounded queue. Vision, OCR, hearing, voice, and security scanners remain services or separately authorized sidecars. The ChatGPT plugin continues to use `qwen-plugin-settings.json`, where MCP, shell, web fetch, and sub-agent spawning are denied; only direct local QCoder sessions receive the bounded Serena profile in `qwen-settings.json`.
 
 ## Recurring self-maintenance
 

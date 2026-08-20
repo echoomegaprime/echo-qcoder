@@ -97,14 +97,15 @@ test("installer is allowlisted and never pipes remote scripts to a shell", () =>
   assert.match(installer, /install-qwen-skills\.ps1'\) -Force/u);
 });
 
-test("FORGE model provisioning creates a bounded 32K derivative without replacing the source", () => {
+test("FORGE model provisioning pins one exact 128K derivative without deleting model data", () => {
   const provisioning = readFileSync(
     resolve(root, "deployment/forge/provision-qcoder-model.sh"),
     "utf8",
   );
-  assert.match(provisioning, /source_model=.*c3po-code:latest/u);
-  assert.match(provisioning, /target_model=.*c3po-code:qcoder-32k/u);
-  assert.match(provisioning, /context_length=.*32768/u);
+  assert.match(provisioning, /source_model=.*huihui_ai\/Qwen3\.6-abliterated:27b/u);
+  assert.match(provisioning, /target_model=.*c3po-code:echo-abliterated-128k/u);
+  assert.match(provisioning, /context_length=.*131072/u);
+  assert.match(provisioning, /source_digest=.*418838acbea7/u);
   assert.match(provisioning, /ollama show --modelfile/u);
   assert.match(provisioning, /ollama create/u);
   assert.match(provisioning, /actual_context/u);

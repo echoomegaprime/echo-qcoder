@@ -4,6 +4,8 @@
 
 QCoder Console is a private ECHO deployment on HAMMER/FORGE. The MCP server runs beside the Windows launcher and reaches FORGE through the existing governed GPU-lease and SOL paths. A container is deliberately not supplied: containerizing the MCP process while delegating terminal control back to the host would add a privileged host-control bridge and weaken the boundary.
 
+The Qwen model runtime itself is separately governed by the loopback-only deployment in [FORGE Qwen route](FORGE_QWEN_ROUTE.md). Raw Ollama remains `127.0.0.1:11436`; QCoder and SDK callers use the fail-closed gateway on port 11437 and the single stable 128K alias.
+
 Production uses stable HTTPS at `https://mcp.echo-op.com/oauth-mcp-qcoder-v1`, Streamable HTTP `/mcp`, and the existing ECHO OAuth authority. The route is currently absent and must be deployed before host testing.
 
 ## Release procedure

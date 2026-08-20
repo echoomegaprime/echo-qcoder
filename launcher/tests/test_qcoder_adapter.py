@@ -110,17 +110,17 @@ class QwenArgumentTests(unittest.TestCase):
         )
         args = adapter.build_qwen_arguments(
             invocation,
-            qwen_model="c3po-code:qcoder-32k",
-            base_url="http://127.0.0.1:11434/v1",
+            qwen_model="c3po-code:echo-abliterated-128k",
+            base_url="http://127.0.0.1:11437/v1",
             api_key="local-qcoder",
         )
 
         self.assertIn("--auth-type", args)
         self.assertIn("openai", args)
         self.assertIn("--openai-base-url", args)
-        self.assertIn("http://127.0.0.1:11434/v1", args)
+        self.assertIn("http://127.0.0.1:11437/v1", args)
         self.assertIn("--model", args)
-        self.assertIn("c3po-code:qcoder-32k", args)
+        self.assertIn("c3po-code:echo-abliterated-128k", args)
         self.assertIn("--approval-mode", args)
         self.assertIn("yolo", args)
         output_index = args.index("--output-format")
@@ -190,12 +190,12 @@ class QwenArgumentTests(unittest.TestCase):
         invocation = adapter.parse_codex_invocation(["-C", r"C:\work", "bootstrap"])
         summary = adapter.safe_invocation_summary(
             invocation,
-            qwen_model="c3po-code:qcoder-32k",
-            base_url="http://127.0.0.1:11434/v1",
+            qwen_model="c3po-code:echo-abliterated-128k",
+            base_url="http://127.0.0.1:11437/v1",
         )
 
         self.assertNotIn(os.environ.get("OPENAI_API_KEY", "secret-never-print"), summary)
-        self.assertIn("c3po-code:qcoder-32k", summary)
+        self.assertIn("c3po-code:echo-abliterated-128k", summary)
 
     def test_qwen_environment_extends_slow_local_model_timeout(self) -> None:
         adapter = load_adapter()

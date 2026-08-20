@@ -1,0 +1,24 @@
+[Unit]
+Description=Pinned dual-GPU Ollama runtime for FORGE Qwen 27B
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=forge
+Group=forge
+WorkingDirectory=/home/forge/services/ollama-qwen-home
+Environment=QWEN_COMPOSE_DIR=/home/forge/services/ollama-qwen-home
+ExecStart=/home/forge/services/qwen-route/current/qwen-home-supervisor.sh
+ExecStop=/usr/bin/docker compose -f /home/forge/services/ollama-qwen-home/docker-compose.yml stop -t 30 qwen
+Restart=always
+RestartSec=5s
+TimeoutStartSec=240s
+TimeoutStopSec=60s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=echo-qwen-home
+
+[Install]
+WantedBy=multi-user.target
