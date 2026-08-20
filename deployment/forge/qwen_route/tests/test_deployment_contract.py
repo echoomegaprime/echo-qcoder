@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class DeploymentContractTests(unittest.TestCase):
     def test_compose_pins_image_loopback_volume_gpu_and_log_rotation(self) -> None:
         compose = (ROOT / "docker-compose.yml").read_text()
+        self.assertIn("name: echo-qwen-home", compose)
         self.assertIn("127.0.0.1:11436:11434", compose)
         self.assertIn("ollama/ollama@sha256:57f573", compose)
         self.assertIn("name: ollama_ollama_data", compose)
@@ -26,6 +27,7 @@ class DeploymentContractTests(unittest.TestCase):
         self.assertIn("Type=simple", home)
         self.assertIn("Restart=always", home)
         self.assertIn("docker wait", supervisor)
+        self.assertIn("--remove-orphans qwen", supervisor)
         self.assertIn("--host 127.0.0.1 --port 11437", route)
         self.assertIn("Requires=echo-qwen-home.service", route)
 
@@ -53,6 +55,13 @@ class DeploymentContractTests(unittest.TestCase):
         self.assertLess(
             stage.index('python3 "$source_root/qwen-warmup.py"'),
             stage.index("systemd-run"),
+        )
+
+    def test_installer_invokes_the_shared_provisioner_through_bash(self) -> None:
+        installer = (ROOT / "install-qwen-route.sh").read_text()
+        self.assertIn(
+            '/usr/bin/bash "$repo_root/deployment/forge/provision-qcoder-model.sh"',
+            installer,
         )
 
     def test_verifier_normalizes_http_header_names(self) -> None:

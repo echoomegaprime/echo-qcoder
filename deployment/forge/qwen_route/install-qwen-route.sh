@@ -89,7 +89,7 @@ QCODER_SOURCE_MODEL=huihui_ai/Qwen3.6-abliterated:27b \
 QCODER_SOURCE_DIGEST=$base_digest \
 QCODER_MODEL=$alias \
 QCODER_CONTEXT_LENGTH=131072 \
-  "$repo_root/deployment/forge/provision-qcoder-model.sh"
+  /usr/bin/bash "$repo_root/deployment/forge/provision-qcoder-model.sh"
 
 alias_digest=$(python3 - "$alias" <<'PY'
 import json

@@ -7,7 +7,7 @@ container=${QWEN_OLLAMA_CONTAINER:-echo-ollama-qwen27b}
 
 cd "$compose_dir"
 docker compose -f "$compose_file" config --quiet
-docker compose -f "$compose_file" up -d qwen >/dev/null
+docker compose -f "$compose_file" up -d --remove-orphans qwen >/dev/null
 
 container_id=$(docker compose -f "$compose_file" ps -q qwen)
 if [[ -z "$container_id" ]]; then
