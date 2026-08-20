@@ -27,7 +27,7 @@ class DeploymentContractTests(unittest.TestCase):
         self.assertIn("Type=simple", home)
         self.assertIn("Restart=always", home)
         self.assertIn("docker wait", supervisor)
-        self.assertIn("--remove-orphans qwen", supervisor)
+        self.assertIn("--force-recreate --remove-orphans qwen", supervisor)
         self.assertIn("--host 127.0.0.1 --port 11437", route)
         self.assertIn("Requires=echo-qwen-home.service", route)
         self.assertIn("Before=echo-titlehound.service", route)
@@ -70,10 +70,21 @@ class DeploymentContractTests(unittest.TestCase):
         )
         self.assertIn('<"$release_dir/register.sql"', installer)
         self.assertNotIn('-f "$release_dir/register.sql"', installer)
-        self.assertIn("systemctl stop echo-titlehound.service", installer)
+        self.assertIn("systemctl disable echo-titlehound.service", installer)
         self.assertIn("titlehound-before.state", installer)
+        self.assertIn("titlehound-before.enabled", installer)
+        self.assertIn("/etc/echo/qwen-dual-gpu.lease", installer)
+        self.assertIn("echo-titlehound-qwen-lease.conf", installer)
+        self.assertIn("systemctl enable echo-titlehound.service", rollback)
         self.assertIn("systemctl start echo-titlehound.service", rollback)
         self.assertIn("titlehound-before.state", rollback)
+        self.assertIn("titlehound-before.enabled", rollback)
+        self.assertIn("titlehound-qwen-lease.conf", rollback)
+        self.assertIn("qwen-dual-gpu.lease", rollback)
+
+    def test_titlehound_lease_condition_blocks_external_reactivation(self) -> None:
+        lease = (ROOT / "echo-titlehound-qwen-lease.conf").read_text()
+        self.assertIn("ConditionPathExists=!/etc/echo/qwen-dual-gpu.lease", lease)
 
     def test_shared_provisioner_preserves_named_parent_through_structured_api(self) -> None:
         provisioner = (ROOT.parent / "provision-qcoder-model.sh").read_text()

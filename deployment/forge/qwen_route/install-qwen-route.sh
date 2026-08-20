@@ -37,6 +37,7 @@ install -m 0644 "$source_root/app.py" "$release_dir/app.py"
 install -m 0755 "$source_root/qwen-warmup.py" "$release_dir/qwen-warmup.py"
 install -m 0755 "$source_root/qwen-home-supervisor.sh" "$release_dir/qwen-home-supervisor.sh"
 install -m 0644 "$source_root/register.sql" "$release_dir/register.sql"
+install -m 0644 "$source_root/echo-titlehound-qwen-lease.conf" "$release_dir/echo-titlehound-qwen-lease.conf"
 chown -R forge:forge "$release_dir"
 
 backup_path() {
@@ -54,23 +55,36 @@ backup_path /etc/systemd/system/echo-qwen-home.service echo-qwen-home.service
 backup_path /etc/systemd/system/echo-qwen-home.service.d/90-qwen-runtime.conf 90-qwen-runtime.conf
 backup_path /etc/systemd/system/echo-qwen-route.service echo-qwen-route.service
 backup_path /etc/echo/qwen-route.env qwen-route.env
+backup_path /etc/systemd/system/echo-titlehound.service.d/10-qwen-dual-gpu-lease.conf titlehound-qwen-lease.conf
+backup_path /etc/echo/qwen-dual-gpu.lease qwen-dual-gpu.lease
 systemctl show echo-qwen-home.service -p FragmentPath -p DropInPaths -p Type -p RemainAfterExit -p Restart -p ActiveState -p SubState >"$backup_dir/systemd-before.txt" || true
 docker inspect echo-ollama-qwen27b >"$backup_dir/container-before.json" 2>/dev/null || true
 docker volume inspect "$volume" >"$backup_dir/volume-before.json"
 systemctl is-active echo-titlehound.service >"$backup_dir/titlehound-before.state" 2>/dev/null || true
+systemctl is-enabled echo-titlehound.service >"$backup_dir/titlehound-before.enabled" 2>/dev/null || true
 
 install -m 0644 "$source_root/docker-compose.yml" "$compose_dir/docker-compose.yml"
 install -m 0644 "$source_root/echo-qwen-home.service" /etc/systemd/system/echo-qwen-home.service
 install -d /etc/systemd/system/echo-qwen-home.service.d
 install -m 0644 "$source_root/echo-qwen-home-runtime.conf" /etc/systemd/system/echo-qwen-home.service.d/90-qwen-runtime.conf
 install -m 0644 "$source_root/echo-qwen-route.service" /etc/systemd/system/echo-qwen-route.service
+install -d /etc/systemd/system/echo-titlehound.service.d
+install -m 0644 "$source_root/echo-titlehound-qwen-lease.conf" /etc/systemd/system/echo-titlehound.service.d/10-qwen-dual-gpu-lease.conf
+printf '%s\n' "$commit" >/etc/echo/qwen-dual-gpu.lease
+chmod 0644 /etc/echo/qwen-dual-gpu.lease
 
 ln -sfn "$release_dir" "$service_root/current.next"
 mv -Tf "$service_root/current.next" "$service_root/current"
 
 docker compose -f "$compose_dir/docker-compose.yml" config --quiet
 systemctl daemon-reload
+systemctl disable echo-titlehound.service >/dev/null 2>&1 || true
 systemctl stop echo-titlehound.service 2>/dev/null || true
+systemctl reset-failed echo-titlehound.service 2>/dev/null || true
+if systemctl is-active --quiet echo-titlehound.service; then
+  printf 'TitleHound remained active after the Qwen dual-GPU lease was installed\n' >&2
+  exit 24
+fi
 systemctl enable echo-qwen-home.service >/dev/null
 systemctl restart echo-qwen-home.service
 
@@ -170,7 +184,7 @@ SQL
 compose_sha=$(sha256sum "$compose_dir/docker-compose.yml" | awk '{print $1}')
 unit_sha=$(sha256sum /etc/systemd/system/echo-qwen-route.service | awk '{print $1}')
 cat >"$service_root/deployment-receipt-$commit.json" <<EOF
-{"service":"echo-qwen-route","commit":"$commit","base_digest":"$base_digest","alias":"$alias","alias_digest":"$alias_digest","context_length":131072,"volume":"$volume","image":"ollama/ollama@sha256:57f573b47f1f71ebb445789f279fe3e596a8beab182f7cf486db9205bad87c5a","compose_sha256":"$compose_sha","unit_sha256":"$unit_sha","gpu_conflict_parked":"echo-titlehound.service","backup_dir":"$backup_dir","deployed_at":"$timestamp"}
+{"service":"echo-qwen-route","commit":"$commit","base_digest":"$base_digest","alias":"$alias","alias_digest":"$alias_digest","context_length":131072,"volume":"$volume","image":"ollama/ollama@sha256:57f573b47f1f71ebb445789f279fe3e596a8beab182f7cf486db9205bad87c5a","compose_sha256":"$compose_sha","unit_sha256":"$unit_sha","gpu_conflict_parked":"echo-titlehound.service","gpu_lease":"/etc/echo/qwen-dual-gpu.lease","backup_dir":"$backup_dir","deployed_at":"$timestamp"}
 EOF
 chown forge:forge "$service_root/deployment-receipt-$commit.json"
 printf 'QWEN_ROUTE_DEPLOYED commit=%s alias_digest=%s context=131072 volume=%s backup=%s\n' "$commit" "$alias_digest" "$volume" "$backup_dir"

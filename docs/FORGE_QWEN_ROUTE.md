@@ -56,12 +56,16 @@ The gateway permits one active model request and one queued request. A third con
 
 The 131072-token runner needs both FORGE GPUs and cannot coexist with the
 GPU0-resident TitleHound vLLM without CPU offload. Promotion therefore records
-and parks `echo-titlehound.service` before restarting the Qwen container. The
-Qwen route is ordered before TitleHound at boot, so its `ExecStartPre` exact
-prewarm acquires and verifies both GPUs before TitleHound's own admission gate
-can run. Readiness remains red if any later workload causes even partial CPU
-offload. Rollback restores TitleHound only when it was active before the
-corresponding deployment backup was captured.
+TitleHound's activity and enablement state, then persistently disables and
+stops `echo-titlehound.service` before restarting the Qwen container. A managed
+systemd condition tied to `/etc/echo/qwen-dual-gpu.lease` makes every explicit
+external reactivation a clean skipped start, preventing both a GPU race and a
+restart storm. The Qwen route is also ordered before TitleHound, so an
+intentional later re-enable cannot race the exact dual-GPU prewarm during boot.
+Readiness remains red if any later workload causes even partial CPU offload.
+Rollback removes the lease condition, restores TitleHound's prior enablement,
+and starts it only when it was active or activating before the corresponding
+deployment backup was captured.
 
 ## Surfaces
 
@@ -117,9 +121,9 @@ It first unloads the model and requires cold readiness to turn red, records the 
 
 ## Lifecycle and rollback
 
-The Ollama image is pinned to `ollama/ollama@sha256:57f573b47f1f71ebb445789f279fe3e596a8beab182f7cf486db9205bad87c5a`. The external volume remains `ollama_ollama_data`; provisioning never removes a model or volume. `echo-qwen-home.service` is `Type=simple`, blocks in `docker wait`, and uses `Restart=always`, so systemd follows actual container liveness instead of remaining falsely green after a oneshot Compose launch.
+The Ollama image is pinned to `ollama/ollama@sha256:57f573b47f1f71ebb445789f279fe3e596a8beab182f7cf486db9205bad87c5a`. The external volume remains `ollama_ollama_data`; provisioning never removes a model or volume. `echo-qwen-home.service` is `Type=simple`, force-recreates the container from the canonical Compose file, blocks in `docker wait`, and uses `Restart=always`, so systemd follows actual container liveness instead of remaining falsely green after a oneshot Compose launch or retaining stale staging-path ownership labels.
 
-Every install backs up the previous Compose file, units, drop-in, route environment, container inspection, volume inspection, and prior TitleHound activity state under:
+Every install backs up the previous Compose file, units, drop-in, route environment, container inspection, volume inspection, and prior TitleHound activity and enablement state under:
 
 ```text
 /home/forge/services/qwen-route/backups/<UTC timestamp>/

@@ -37,13 +37,20 @@ restore_path echo-qwen-home.service /etc/systemd/system/echo-qwen-home.service
 restore_path 90-qwen-runtime.conf /etc/systemd/system/echo-qwen-home.service.d/90-qwen-runtime.conf
 restore_path echo-qwen-route.service /etc/systemd/system/echo-qwen-route.service
 restore_path qwen-route.env /etc/echo/qwen-route.env
+restore_path titlehound-qwen-lease.conf /etc/systemd/system/echo-titlehound.service.d/10-qwen-dual-gpu-lease.conf
+restore_path qwen-dual-gpu.lease /etc/echo/qwen-dual-gpu.lease
 systemctl daemon-reload
 systemctl restart echo-qwen-home.service
 if [[ -f /etc/systemd/system/echo-qwen-route.service ]]; then
   systemctl restart echo-qwen-route.service
 fi
+if [[ -f "$backup_dir/titlehound-before.enabled" ]] &&
+   grep -qx enabled "$backup_dir/titlehound-before.enabled"; then
+  systemctl enable echo-titlehound.service >/dev/null
+fi
 if [[ -f "$backup_dir/titlehound-before.state" ]] &&
-   grep -qx active "$backup_dir/titlehound-before.state"; then
+   grep -Eqx 'active|activating' "$backup_dir/titlehound-before.state"; then
+  systemctl reset-failed echo-titlehound.service 2>/dev/null || true
   systemctl start echo-titlehound.service
 fi
 docker volume inspect ollama_ollama_data >/dev/null
