@@ -86,6 +86,11 @@ Structured logs contain only request ID, method, path, status, duration, and req
 - `echo.qwen.local.openai_chat`
 - `echo.qwen.local.token_budget`
 
+The health capability is tier 0. Model registration also writes the explicit
+activation permit required by the fleet's `llm_models` catalog gate; without
+that evidence row the trigger deliberately leaves a newly introduced model
+inactive even when its endpoint is healthy.
+
 It also registers `forge-local-qwen-27b-128k` in `arcanum_sdk.model_registry` and `(ollama-local-forge, c3po-code:echo-abliterated-128k)` in `arcanum_sdk.llm_models`. These names intentionally distinguish this dedicated loopback runtime from Groq, OpenRouter, Together, Cloudflare, NVIDIA, and other cloud Qwen catalog entries.
 
 ## Staging, verification, and promotion

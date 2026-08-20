@@ -39,6 +39,10 @@ class DeploymentContractTests(unittest.TestCase):
         self.assertIn("ollama-local-forge", sql)
         self.assertIn("'cloud_lane', false", sql)
         self.assertIn("http://127.0.0.1:11437/v1", sql)
+        self.assertIn("'echo.qwen.local.health'", sql)
+        self.assertIn("'tier:0'", sql)
+        self.assertIn("llm_model_activation_permits", sql)
+        self.assertIn("'c3po-code:echo-abliterated-128k'", sql)
 
     def test_app_has_no_prompt_logging_and_forces_no_truncation(self) -> None:
         app = (ROOT / "app.py").read_text()
