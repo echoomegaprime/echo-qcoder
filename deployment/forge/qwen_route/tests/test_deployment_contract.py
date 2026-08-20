@@ -44,6 +44,16 @@ class DeploymentContractTests(unittest.TestCase):
         self.assertGreaterEqual(app.count('"shift": False'), 2)
         self.assertIn('"prompt_eval_count"', app)
 
+    def test_stage_prewarms_exact_model_and_never_continues_while_red(self) -> None:
+        stage = (ROOT / "stage-qwen-route.sh").read_text()
+        self.assertIn('python3 "$source_root/qwen-warmup.py"', stage)
+        self.assertIn('QWEN_ALIAS_DIGEST="$alias_digest"', stage)
+        self.assertIn('if [[ "$ready" -ne 1 ]]', stage)
+        self.assertLess(
+            stage.index('python3 "$source_root/qwen-warmup.py"'),
+            stage.index("systemd-run"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

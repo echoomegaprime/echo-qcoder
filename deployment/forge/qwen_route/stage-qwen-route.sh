@@ -25,6 +25,15 @@ if [[ ! "$alias_digest" =~ ^[0-9a-f]{64}$ ]]; then
   exit 22
 fi
 
+sudo -u forge env \
+  QWEN_UPSTREAM=http://127.0.0.1:11436 \
+  QWEN_MODEL_ALIAS=c3po-code:echo-abliterated-128k \
+  QWEN_BASE_DIGEST=418838acbea7dad6eca43e2f74519307235e62b584e08ab7a6e7d6916cff7507 \
+  QWEN_ALIAS_DIGEST="$alias_digest" \
+  QWEN_CONTEXT_LENGTH=131072 \
+  QWEN_MODEL_BYTES=23152946049 \
+  python3 "$source_root/qwen-warmup.py"
+
 unit=echo-qwen-route-stage
 systemctl stop "$unit.service" 2>/dev/null || true
 systemctl reset-failed "$unit.service" 2>/dev/null || true
@@ -49,6 +58,7 @@ systemd-run \
   --setenv=QWEN_MAX_QUEUE_DEPTH=1 \
   /usr/bin/python3 -m uvicorn app:app --host 127.0.0.1 --port 18437 --workers 1 --no-access-log >/dev/null
 
+ready=0
 for _ in $(seq 1 60); do
   if python3 - <<'PY'
 import json
@@ -59,10 +69,15 @@ if response.status != 200 or payload.get("ok") is not True:
     raise SystemExit(1)
 PY
   then
+    ready=1
     break
   fi
   sleep 2
 done
+if [[ "$ready" -ne 1 ]]; then
+  printf 'staged governed route did not become exact-ready\n' >&2
+  exit 23
+fi
 python3 "$source_root/verify-qwen-route.py" \
   --base http://127.0.0.1:18437 \
   --report "/tmp/qwen-route-stage-$commit.json" >/dev/null
