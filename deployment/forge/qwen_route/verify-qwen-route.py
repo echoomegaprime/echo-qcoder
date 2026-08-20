@@ -75,6 +75,18 @@ def exact_health(base: str) -> dict:
     return {"status": status, "elapsed_s": round(elapsed, 3), "checks": checks}
 
 
+def wait_exact_health(base: str, attempts: int = 900, interval: float = 1.0) -> dict:
+    """Wait through bounded process/socket transitions for the exact-ready contract."""
+    last_error: BaseException | None = None
+    for _ in range(attempts):
+        try:
+            return exact_health(base)
+        except (AssertionError, OSError, urllib.error.URLError) as exc:
+            last_error = exc
+            time.sleep(interval)
+    raise AssertionError(f"exact readiness did not recover: {last_error}")
+
+
 def small_canaries(base: str) -> dict:
     native = {
         "model": MODEL,
@@ -283,7 +295,7 @@ def destructive_recovery(base: str) -> dict:
     restart_route = command("systemctl", "restart", "echo-qwen-route.service", timeout=1800)
     if restart_route.returncode != 0:
         raise AssertionError("route warmup restart failed")
-    exact_health(base)
+    wait_exact_health(base)
     cold_load_seconds = time.perf_counter() - cold_started
     warm_started = time.perf_counter()
     status, _, _, _ = call(
@@ -308,8 +320,13 @@ def destructive_recovery(base: str) -> dict:
         raise AssertionError("container death injection failed")
     saw_red = False
     recovered = False
-    for _ in range(180):
-        status, payload, _, _ = call(base, "/health", timeout=10)
+    for _ in range(900):
+        try:
+            status, payload, _, _ = call(base, "/health", timeout=10)
+        except (OSError, urllib.error.URLError):
+            saw_red = True
+            time.sleep(1)
+            continue
         if status == 503 and payload.get("ok") is False:
             saw_red = True
         if saw_red and status == 200 and payload.get("ok") is True:
@@ -324,14 +341,7 @@ def destructive_recovery(base: str) -> dict:
     restart = command("systemctl", "restart", "echo-qwen-home.service", timeout=1800)
     if restart.returncode != 0:
         raise AssertionError("service restart failed")
-    for _ in range(180):
-        try:
-            after = exact_health(base)
-            break
-        except (AssertionError, OSError, urllib.error.URLError):
-            time.sleep(1)
-    else:
-        raise AssertionError("route did not recover after service restart")
+    after = wait_exact_health(base)
     after_alias = after["checks"]["alias"]["digest"]
     if before_alias != after_alias:
         raise AssertionError("stable alias digest changed across service restart")

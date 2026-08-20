@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import sys
 import unittest
+import urllib.error
 from pathlib import Path
 from unittest.mock import patch
 
@@ -16,6 +17,21 @@ SPEC.loader.exec_module(verifier)
 
 
 class VerifierContractTests(unittest.TestCase):
+    def test_wait_exact_health_tolerates_bounded_socket_transition(self) -> None:
+        ready = {"status": 200, "checks": {"resident_model": {"ok": True}}}
+        with (
+            patch.object(
+                verifier,
+                "exact_health",
+                side_effect=[urllib.error.URLError("starting"), ready],
+            ),
+            patch.object(verifier.time, "sleep") as sleep,
+        ):
+            result = verifier.wait_exact_health("http://127.0.0.1:11437", attempts=2)
+
+        self.assertEqual(result, ready)
+        sleep.assert_called_once_with(1.0)
+
     def test_120k_generation_preserves_four_thousand_token_reserve(self) -> None:
         prompt = "deterministic prompt"
         fitted_budget = {
