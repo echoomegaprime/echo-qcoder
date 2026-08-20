@@ -44,7 +44,7 @@ def call(base: str, path: str, body: dict | None = None, timeout: int = 2400) ->
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             payload = json.load(response)
-            headers = dict(response.headers.items())
+            headers = {key.lower(): value for key, value in response.headers.items()}
             return response.status, payload, time.perf_counter() - started, headers
     except urllib.error.HTTPError as exc:
         try:
@@ -100,7 +100,7 @@ def small_canaries(base: str) -> dict:
     status2, payload2, openai_seconds, headers2 = call(base, "/v1/chat/completions", openai)
     if status2 != 200 or payload2.get("route_metadata", {}).get("reasoning_effort") != "none":
         raise AssertionError(f"OpenAI chat failed: {status2}")
-    if headers2.get("X-Qwen-Truncated") != "false" or headers2.get("X-Qwen-Shifted") != "false":
+    if headers2.get("x-qwen-truncated") != "false" or headers2.get("x-qwen-shifted") != "false":
         raise AssertionError("OpenAI route did not prove no truncation/no shift")
 
     wrong = dict(openai)

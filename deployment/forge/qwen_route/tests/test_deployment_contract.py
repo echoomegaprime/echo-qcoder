@@ -54,6 +54,12 @@ class DeploymentContractTests(unittest.TestCase):
             stage.index("systemd-run"),
         )
 
+    def test_verifier_normalizes_http_header_names(self) -> None:
+        verifier = (ROOT / "verify-qwen-route.py").read_text()
+        self.assertIn("key.lower(): value", verifier)
+        self.assertIn('headers2.get("x-qwen-truncated")', verifier)
+        self.assertIn('headers2.get("x-qwen-shifted")', verifier)
+
 
 if __name__ == "__main__":
     unittest.main()
