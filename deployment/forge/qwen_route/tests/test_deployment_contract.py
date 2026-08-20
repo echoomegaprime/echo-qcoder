@@ -48,9 +48,12 @@ class DeploymentContractTests(unittest.TestCase):
 
     def test_stage_prewarms_exact_model_and_never_continues_while_red(self) -> None:
         stage = (ROOT / "stage-qwen-route.sh").read_text()
+        warmup = (ROOT / "qwen-warmup.py").read_text()
         self.assertIn('python3 "$source_root/qwen-warmup.py"', stage)
         self.assertIn('QWEN_ALIAS_DIGEST="$alias_digest"', stage)
-        self.assertEqual(stage.count("QWEN_MODEL_BYTES=23152925077"), 2)
+        self.assertNotIn("QWEN_MODEL_BYTES", stage)
+        self.assertNotIn("MODEL_BYTES", warmup)
+        self.assertIn("resident_vram != resident_size", warmup)
         self.assertIn('if [[ "$ready" -ne 1 ]]', stage)
         self.assertLess(
             stage.index('python3 "$source_root/qwen-warmup.py"'),

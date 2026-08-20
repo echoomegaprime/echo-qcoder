@@ -31,7 +31,6 @@ sudo -u forge env \
   QWEN_BASE_DIGEST=418838acbea7dad6eca43e2f74519307235e62b584e08ab7a6e7d6916cff7507 \
   QWEN_ALIAS_DIGEST="$alias_digest" \
   QWEN_CONTEXT_LENGTH=131072 \
-  QWEN_MODEL_BYTES=23152925077 \
   python3 "$source_root/qwen-warmup.py"
 
 unit=echo-qwen-route-stage
@@ -52,7 +51,6 @@ systemd-run \
   --setenv=QWEN_ALIAS_DIGEST="$alias_digest" \
   --setenv=QWEN_RELEASE_SHA="$commit" \
   --setenv=QWEN_CONTEXT_LENGTH=131072 \
-  --setenv=QWEN_MODEL_BYTES=23152925077 \
   --setenv=QWEN_GPU_COUNT=2 \
   --setenv=QWEN_OLLAMA_CONTAINER=echo-ollama-qwen27b \
   --setenv=QWEN_MAX_QUEUE_DEPTH=1 \

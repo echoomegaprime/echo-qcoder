@@ -18,7 +18,6 @@ DIGEST = os.environ.get(
 )
 ALIAS_DIGEST = os.environ.get("QWEN_ALIAS_DIGEST", "")
 CONTEXT = int(os.environ.get("QWEN_CONTEXT_LENGTH", "131072"))
-MODEL_BYTES = int(os.environ.get("QWEN_MODEL_BYTES", "23152925077"))
 
 
 def request(path: str, body: dict | None = None, timeout: float = 1200) -> dict:
@@ -87,10 +86,12 @@ if not isinstance(resident, dict):
     raise SystemExit("QWEN_WARMUP_EXACT_MODEL_NOT_RESIDENT")
 if resident.get("context_length") != CONTEXT:
     raise SystemExit("QWEN_WARMUP_CONTEXT_MISMATCH")
-if resident.get("size") != MODEL_BYTES or resident.get("size_vram") != MODEL_BYTES:
+resident_size = resident.get("size")
+resident_vram = resident.get("size_vram")
+if not isinstance(resident_size, int) or resident_size <= 0 or resident_vram != resident_size:
     raise SystemExit("QWEN_WARMUP_GPU_RESIDENCY_MISMATCH")
 print(
     "QWEN_WARM_READY "
     f"base_digest={DIGEST} alias_digest={ALIAS_DIGEST} "
-    f"context={CONTEXT} size_vram={resident['size_vram']}"
+    f"context={CONTEXT} size={resident_size} size_vram={resident_vram}"
 )

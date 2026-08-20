@@ -43,7 +43,6 @@ EXPECTED_ALIAS_DIGEST = os.environ.get(
     "a8b6dbff993304b29040d734ebc2d118b212e23feec64e0343fff85d9c02c5b0",
 )
 EXPECTED_CONTEXT = int(os.environ.get("QWEN_CONTEXT_LENGTH", "131072"))
-EXPECTED_MODEL_BYTES = int(os.environ.get("QWEN_MODEL_BYTES", "23152925077"))
 EXPECTED_GPU_COUNT = int(os.environ.get("QWEN_GPU_COUNT", "2"))
 OLLAMA_CONTAINER = os.environ.get("QWEN_OLLAMA_CONTAINER", "echo-ollama-qwen27b")
 NVIDIA_SMI = os.environ.get("QWEN_NVIDIA_SMI", "/usr/bin/nvidia-smi")
@@ -377,11 +376,14 @@ async def _runtime_health(*, use_cache: bool = True) -> dict[str, Any]:
         )
         resident_ok = isinstance(resident, dict)
         if resident_ok:
+            resident_size = resident.get("size")
+            resident_vram = resident.get("size_vram")
             resident_ok = (
                 resident.get("name") == MODEL_ALIAS
-                and int(resident.get("context_length", -1)) == EXPECTED_CONTEXT
-                and int(resident.get("size", -1)) == EXPECTED_MODEL_BYTES
-                and int(resident.get("size_vram", -2)) == EXPECTED_MODEL_BYTES
+                and resident.get("context_length") == EXPECTED_CONTEXT
+                and isinstance(resident_size, int)
+                and resident_size > 0
+                and resident_vram == resident_size
             )
         checks["resident_model"] = {
             "ok": resident_ok,
@@ -390,6 +392,8 @@ async def _runtime_health(*, use_cache: bool = True) -> dict[str, Any]:
             "expected_digest": EXPECTED_ALIAS_DIGEST or "UNCONFIGURED",
             "context": resident.get("context_length") if isinstance(resident, dict) else None,
             "expected_context": EXPECTED_CONTEXT,
+            "size": resident.get("size") if isinstance(resident, dict) else None,
+            "size_vram": resident.get("size_vram") if isinstance(resident, dict) else None,
             "fully_gpu_resident": bool(
                 isinstance(resident, dict)
                 and resident.get("size") == resident.get("size_vram")

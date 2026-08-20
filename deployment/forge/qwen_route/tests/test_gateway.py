@@ -264,8 +264,8 @@ class GatewayContractTests(unittest.IsolatedAsyncioTestCase):
                             "name": gateway.MODEL_ALIAS,
                             "digest": "b" * 64,
                             "context_length": 131072,
-                            "size": gateway.EXPECTED_MODEL_BYTES,
-                            "size_vram": gateway.EXPECTED_MODEL_BYTES,
+                            "size": 23_152_925_077,
+                            "size_vram": 23_152_925_077,
                         }
                     ]
                 }
@@ -316,8 +316,8 @@ class GatewayContractTests(unittest.IsolatedAsyncioTestCase):
                             "name": gateway.MODEL_ALIAS,
                             "digest": gateway.EXPECTED_ALIAS_DIGEST,
                             "context_length": 131072,
-                            "size": gateway.EXPECTED_MODEL_BYTES,
-                            "size_vram": gateway.EXPECTED_MODEL_BYTES,
+                            "size": 23_152_925_077,
+                            "size_vram": 23_152_925_077,
                         }
                     ]
                 }
@@ -384,8 +384,8 @@ class GatewayContractTests(unittest.IsolatedAsyncioTestCase):
                             "name": gateway.MODEL_ALIAS,
                             "digest": gateway.EXPECTED_ALIAS_DIGEST,
                             "context_length": 131072,
-                            "size": gateway.EXPECTED_MODEL_BYTES,
-                            "size_vram": gateway.EXPECTED_MODEL_BYTES,
+                            "size": 23_152_925_077,
+                            "size_vram": 23_152_925_077,
                         }
                     ]
                 }
@@ -405,6 +405,47 @@ class GatewayContractTests(unittest.IsolatedAsyncioTestCase):
             result = await gateway._runtime_health(use_cache=False)
         self.assertFalse(result["ok"])
         self.assertEqual(result["checks"]["gpu_processes"]["resident_gpu_count"], 1)
+
+    async def test_health_is_red_when_resident_bytes_spill_to_cpu(self) -> None:
+        async def fake_fetch(method: str, path: str, **_: object) -> dict:
+            if path == "/api/tags":
+                return {
+                    "models": [
+                        {"name": gateway.MODEL_ALIAS, "digest": gateway.EXPECTED_ALIAS_DIGEST},
+                        {"name": gateway.BASE_MODEL, "digest": gateway.EXPECTED_BASE_DIGEST},
+                    ]
+                }
+            if path == "/api/show":
+                return {
+                    "details": {"parent_model": gateway.BASE_MODEL},
+                    "parameters": "num_ctx 131072",
+                }
+            if path == "/api/ps":
+                return {
+                    "models": [
+                        {
+                            "name": gateway.MODEL_ALIAS,
+                            "digest": gateway.EXPECTED_ALIAS_DIGEST,
+                            "context_length": 131072,
+                            "size": 23_152_946_049,
+                            "size_vram": 23_152_925_077,
+                        }
+                    ]
+                }
+            raise AssertionError(path)
+
+        with (
+            patch.object(gateway, "_fetch_json", side_effect=fake_fetch),
+            patch.object(gateway, "_container_check", AsyncMock(return_value={"ok": True})),
+            patch.object(gateway, "_gpu_check", AsyncMock(return_value={"ok": True})),
+        ):
+            result = await gateway._runtime_health(use_cache=False)
+
+        resident = result["checks"]["resident_model"]
+        self.assertFalse(result["ok"])
+        self.assertFalse(resident["ok"])
+        self.assertFalse(resident["fully_gpu_resident"])
+        self.assertNotEqual(resident["size"], resident["size_vram"])
 
     async def test_routed_messages_preserve_all_needles_without_trimming(self) -> None:
         needles = [f"NEEDLE_{index:02d}_A7F3" for index in range(5)]
