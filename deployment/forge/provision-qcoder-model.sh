@@ -39,26 +39,31 @@ if [[ "$actual_source_digest" != "$source_digest" ]]; then
   exit 24
 fi
 
-workdir=$(mktemp -d -t qcoder-model.XXXXXXXX)
-modelfile="$workdir/Modelfile"
-container_modelfile="/tmp/qcoder-model-${RANDOM}-${RANDOM}.Modelfile"
-cleanup() {
-  docker exec "$container" rm -f -- "$container_modelfile" >/dev/null 2>&1 || true
-  rm -f -- "$modelfile"
-  rmdir -- "$workdir" 2>/dev/null || true
-}
-trap cleanup EXIT
+python3 - "$source_model" "$target_model" "$context_length" <<'PY'
+import json
+import sys
+import urllib.request
 
-docker exec "$container" ollama show --modelfile "$source_model" >"$modelfile"
-if grep -qE '^PARAMETER[[:space:]]+num_ctx[[:space:]]+' "$modelfile"; then
-  sed -E -i "s/^PARAMETER[[:space:]]+num_ctx[[:space:]]+.*/PARAMETER num_ctx $context_length/" "$modelfile"
-else
-  printf '\nPARAMETER num_ctx %s\n' "$context_length" >>"$modelfile"
-fi
-
-grep -qE "^PARAMETER[[:space:]]+num_ctx[[:space:]]+$context_length$" "$modelfile"
-docker cp "$modelfile" "$container:$container_modelfile" >/dev/null
-docker exec "$container" ollama create "$target_model" -f "$container_modelfile"
+source, target, context = sys.argv[1], sys.argv[2], int(sys.argv[3])
+body = json.dumps(
+    {
+        "model": target,
+        "from": source,
+        "parameters": {"num_ctx": context},
+        "stream": False,
+    },
+    separators=(",", ":"),
+).encode()
+request = urllib.request.Request(
+    "http://127.0.0.1:11436/api/create",
+    data=body,
+    headers={"Content-Type": "application/json"},
+)
+with urllib.request.urlopen(request, timeout=1200) as response:
+    payload = json.load(response)
+if response.status != 200 or payload.get("status") != "success":
+    raise SystemExit("QCoder structured alias creation failed")
+PY
 
 actual_context=$(
   docker exec "$container" ollama show --parameters "$target_model" |
@@ -85,7 +90,7 @@ with urllib.request.urlopen(request, timeout=30) as response:
 print(payload.get("details", {}).get("parent_model", ""))
 PY
 )
-if [[ -n "$actual_parent" && "$actual_parent" != "$source_model" ]]; then
+if [[ "$actual_parent" != "$source_model" ]]; then
   printf 'QCoder target parent mismatch\n' >&2
   exit 25
 fi

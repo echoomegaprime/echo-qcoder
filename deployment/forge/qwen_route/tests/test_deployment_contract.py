@@ -67,6 +67,14 @@ class DeploymentContractTests(unittest.TestCase):
             installer,
         )
 
+    def test_shared_provisioner_preserves_named_parent_through_structured_api(self) -> None:
+        provisioner = (ROOT.parent / "provision-qcoder-model.sh").read_text()
+        self.assertIn("127.0.0.1:11436/api/create", provisioner)
+        self.assertIn('"from": source', provisioner)
+        self.assertIn('"parameters": {"num_ctx": context}', provisioner)
+        self.assertIn('if [[ "$actual_parent" != "$source_model" ]]', provisioner)
+        self.assertNotIn("ollama show --modelfile", provisioner)
+
     def test_verifier_normalizes_http_header_names(self) -> None:
         verifier = (ROOT / "verify-qwen-route.py").read_text()
         self.assertIn("key.lower(): value", verifier)
