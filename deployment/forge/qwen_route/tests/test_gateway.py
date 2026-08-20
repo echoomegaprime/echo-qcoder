@@ -67,6 +67,7 @@ class GatewayContractTests(unittest.IsolatedAsyncioTestCase):
         gateway.STATE.in_system = 0
         gateway.STATE.active = 0
         gateway.EXPECTED_ALIAS_DIGEST = "a" * 64
+        gateway.RELEASE_SHA = "f" * 40
 
     async def test_native_execution_forces_exact_nontruncating_contract(self) -> None:
         calls: list[dict] = []
@@ -278,6 +279,62 @@ class GatewayContractTests(unittest.IsolatedAsyncioTestCase):
             result = await gateway._runtime_health(use_cache=False)
         self.assertFalse(result["ok"])
         self.assertFalse(result["checks"]["resident_model"]["ok"])
+        self.assertEqual(result["base_model"], gateway.BASE_MODEL)
+        self.assertEqual(
+            result["base_digest"], f"sha256:{gateway.EXPECTED_BASE_DIGEST}"
+        )
+        self.assertEqual(result["context_length"], 131072)
+        self.assertFalse(result["resident"])
+        self.assertIs(result["truncate"], False)
+        self.assertIs(result["shift"], False)
+        self.assertEqual(result["release_sha"], "f" * 40)
+
+    async def test_health_is_red_for_missing_release_identity(self) -> None:
+        async def fake_fetch(method: str, path: str, **_: object) -> dict:
+            if path == "/api/tags":
+                return {
+                    "models": [
+                        {
+                            "name": gateway.MODEL_ALIAS,
+                            "digest": gateway.EXPECTED_ALIAS_DIGEST,
+                        },
+                        {
+                            "name": gateway.BASE_MODEL,
+                            "digest": gateway.EXPECTED_BASE_DIGEST,
+                        },
+                    ]
+                }
+            if path == "/api/show":
+                return {
+                    "details": {"parent_model": gateway.BASE_MODEL},
+                    "parameters": "num_ctx 131072",
+                }
+            if path == "/api/ps":
+                return {
+                    "models": [
+                        {
+                            "name": gateway.MODEL_ALIAS,
+                            "digest": gateway.EXPECTED_ALIAS_DIGEST,
+                            "context_length": 131072,
+                            "size": gateway.EXPECTED_MODEL_BYTES,
+                            "size_vram": gateway.EXPECTED_MODEL_BYTES,
+                        }
+                    ]
+                }
+            raise AssertionError(path)
+
+        with (
+            patch.object(gateway, "RELEASE_SHA", ""),
+            patch.object(gateway, "_fetch_json", side_effect=fake_fetch),
+            patch.object(
+                gateway, "_container_check", AsyncMock(return_value={"ok": True})
+            ),
+            patch.object(gateway, "_gpu_check", AsyncMock(return_value={"ok": True})),
+        ):
+            result = await gateway._runtime_health(use_cache=False)
+        self.assertFalse(result["ok"])
+        self.assertFalse(result["checks"]["release_identity"]["ok"])
+        self.assertEqual(result["checks"]["release_identity"]["release_sha"], "UNCONFIGURED")
 
     async def test_health_is_red_when_model_is_cold_or_unloaded(self) -> None:
         async def fake_fetch(method: str, path: str, **_: object) -> dict:

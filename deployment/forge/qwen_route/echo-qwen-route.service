@@ -8,6 +8,7 @@ Requires=echo-qwen-home.service
 Type=simple
 User=forge
 Group=forge
+SupplementaryGroups=docker
 WorkingDirectory=/home/forge/services/qwen-route/current
 EnvironmentFile=/etc/echo/qwen-route.env
 ExecStartPre=/usr/bin/python3 /home/forge/services/qwen-route/current/qwen-warmup.py

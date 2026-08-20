@@ -58,6 +58,7 @@ TOOL_MARGIN_TOKENS = int(os.environ.get("QWEN_TOOL_MARGIN_TOKENS", "512"))
 NO_TOOL_MARGIN_TOKENS = int(os.environ.get("QWEN_NO_TOOL_MARGIN_TOKENS", "128"))
 HEALTH_CACHE_SECONDS = float(os.environ.get("QWEN_HEALTH_CACHE_SECONDS", "2"))
 KEEP_ALIVE = os.environ.get("QWEN_KEEP_ALIVE", "24h")
+RELEASE_SHA = os.environ.get("QWEN_RELEASE_SHA", "")
 
 if EXPECTED_CONTEXT != 131072:
     raise RuntimeError("QWEN_CONTEXT_LENGTH must remain exactly 131072")
@@ -69,6 +70,7 @@ logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"))
 LOG = logging.getLogger(SERVICE)
 _SAFE_REQUEST_ID = re.compile(r"^[A-Za-z0-9_.:-]{1,96}$")
 _REASONING_MARKER = re.compile(r"<think(?:\s[^>]*)?>", re.IGNORECASE)
+_RELEASE_SHA = re.compile(r"^[0-9a-f]{40}$")
 
 
 class RouteFailure(Exception):
@@ -318,6 +320,10 @@ async def _runtime_health(*, use_cache: bool = True) -> dict[str, Any]:
         return _health_cache[1]
 
     checks: dict[str, dict[str, Any]] = {}
+    checks["release_identity"] = {
+        "ok": _RELEASE_SHA.fullmatch(RELEASE_SHA) is not None,
+        "release_sha": RELEASE_SHA or "UNCONFIGURED",
+    }
     try:
         tags = await _fetch_json("GET", "/api/tags", timeout=5.0)
         alias = next(
@@ -408,6 +414,12 @@ async def _runtime_health(*, use_cache: bool = True) -> dict[str, Any]:
         "upstream": "127.0.0.1:11436",
         "model": MODEL_ALIAS,
         "base_model": BASE_MODEL,
+        "base_digest": f"sha256:{EXPECTED_BASE_DIGEST}",
+        "context_length": EXPECTED_CONTEXT,
+        "resident": checks.get("resident_model", {}).get("ok") is True,
+        "truncate": False,
+        "shift": False,
+        "release_sha": RELEASE_SHA,
         "checks": checks,
         "queue": {
             "active": STATE.active,

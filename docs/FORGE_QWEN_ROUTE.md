@@ -13,6 +13,12 @@ The model runtime and the governed caller route are deliberately separate:
 - Context: exactly 131,072 tokens.
 - Mode: nonthinking (`think:false`, OpenAI `reasoning_effort:"none"`).
 
+Consumers use the governed `/ready` endpoint on port `11437`; raw Ollama on
+`11436` is not a readiness surface. The response publishes the exact
+`base_model`, `sha256:`-prefixed `base_digest`, `context_length`, `resident`,
+`truncate`, `shift`, and tracked `release_sha` so callers can enforce the full
+runtime contract without inferring identity from a status code.
+
 Former `qcoder-32k` and `qcoder-64k` tags may remain in the persistent Ollama volume as recoverable historical data, but no launcher, gateway, SDK capability, or model-registry row selects them. The one active route is explicitly identified as provider `ollama-local-forge`; cloud Qwen providers remain separate registry rows.
 
 ## Fail-closed readiness
@@ -21,9 +27,10 @@ Former `qcoder-32k` and `qcoder-64k` tags may remain in the persistent Ollama vo
 
 1. the stable alias exists at its deployment-recorded exact digest;
 2. `/api/show` reports the exact parent model and `num_ctx 131072`;
-3. `/api/ps` reports the exact parent digest, exact context, exact model byte size, and `size_vram == size`;
+3. `/api/ps` reports the exact stable-alias digest, exact context, exact model byte size, and `size_vram == size`;
 4. the pinned Docker container is running, not OOM-killed, and healthy;
-5. an Ollama runner process is resident on exactly two GPUs.
+5. an Ollama runner process is resident on exactly two GPUs;
+6. `QWEN_RELEASE_SHA` is an exact lowercase 40-hex tracked release commit.
 
 A stopped, cold, partially offloaded, wrong-model, wrong-context, wrong-digest, or unreachable runtime is red. `GET /livez` is the process-only liveness endpoint and never substitutes for readiness.
 

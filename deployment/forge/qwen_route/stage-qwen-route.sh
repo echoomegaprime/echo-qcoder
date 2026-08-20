@@ -32,6 +32,7 @@ systemd-run \
   --unit="$unit" \
   --uid=forge \
   --gid=forge \
+  --property=SupplementaryGroups=docker \
   --working-directory="$source_root" \
   --property=Restart=on-failure \
   --property=RestartSec=3s \
@@ -40,6 +41,7 @@ systemd-run \
   --setenv=QWEN_BASE_MODEL=huihui_ai/Qwen3.6-abliterated:27b \
   --setenv=QWEN_BASE_DIGEST=418838acbea7dad6eca43e2f74519307235e62b584e08ab7a6e7d6916cff7507 \
   --setenv=QWEN_ALIAS_DIGEST="$alias_digest" \
+  --setenv=QWEN_RELEASE_SHA="$commit" \
   --setenv=QWEN_CONTEXT_LENGTH=131072 \
   --setenv=QWEN_MODEL_BYTES=23152946049 \
   --setenv=QWEN_GPU_COUNT=2 \
@@ -63,6 +65,6 @@ PY
 done
 python3 "$source_root/verify-qwen-route.py" \
   --base http://127.0.0.1:18437 \
-  --report "$source_root/stage-quick-$commit.json" >/dev/null
+  --report "/tmp/qwen-route-stage-$commit.json" >/dev/null
 printf 'QWEN_ROUTE_STAGE_GREEN commit=%s port=18437 alias_digest=%s report=%s\n' \
-  "$commit" "$alias_digest" "$source_root/stage-quick-$commit.json"
+  "$commit" "$alias_digest" "/tmp/qwen-route-stage-$commit.json"

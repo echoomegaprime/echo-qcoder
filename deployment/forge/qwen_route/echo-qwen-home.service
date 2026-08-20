@@ -8,6 +8,7 @@ Requires=docker.service
 Type=simple
 User=forge
 Group=forge
+SupplementaryGroups=docker
 WorkingDirectory=/home/forge/services/ollama-qwen-home
 Environment=QWEN_COMPOSE_DIR=/home/forge/services/ollama-qwen-home
 ExecStart=/home/forge/services/qwen-route/current/qwen-home-supervisor.sh

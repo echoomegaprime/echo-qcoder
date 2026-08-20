@@ -13,7 +13,7 @@ VALUES
   'Fail-closed exact-digest health for the FORGE-local Qwen 27B 128K route (not a cloud Qwen lane)',
   'http', 'http://127.0.0.1:11437/health', 'GET', 'query', 'forge',
   '{"type":"object","properties":{"command":{"const":"health"}},"required":["command"],"additionalProperties":false}'::jsonb,
-  '{"type":"object","required":["ok","status","service","checks"],"properties":{"ok":{"type":"boolean"},"status":{"type":"string"},"service":{"const":"echo-qwen-route"},"checks":{"type":"object"}}}'::jsonb,
+  '{"type":"object","required":["ok","status","service","base_model","base_digest","context_length","resident","truncate","shift","release_sha","checks"],"properties":{"ok":{"type":"boolean"},"status":{"type":"string"},"service":{"const":"echo-qwen-route"},"base_model":{"const":"huihui_ai/Qwen3.6-abliterated:27b"},"base_digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"context_length":{"const":131072},"resident":{"type":"boolean"},"truncate":{"const":false},"shift":{"const":false},"release_sha":{"type":"string","pattern":"^[0-9a-f]{40}$"},"checks":{"type":"object"}}}'::jsonb,
   'read', 1, 0, 1, false, 'unknown', false, true, 'active', 10, true, '{}'::jsonb
 ),
 (
