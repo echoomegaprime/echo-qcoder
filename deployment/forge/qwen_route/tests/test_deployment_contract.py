@@ -66,6 +66,8 @@ class DeploymentContractTests(unittest.TestCase):
             '/usr/bin/bash "$repo_root/deployment/forge/provision-qcoder-model.sh"',
             installer,
         )
+        self.assertIn('<"$release_dir/register.sql"', installer)
+        self.assertNotIn('-f "$release_dir/register.sql"', installer)
 
     def test_shared_provisioner_preserves_named_parent_through_structured_api(self) -> None:
         provisioner = (ROOT.parent / "provision-qcoder-model.sh").read_text()

@@ -127,7 +127,8 @@ QWEN_KEEP_ALIVE=24h
 EOF
 install -o root -g forge -m 0640 "$backup_dir/qwen-route.env.new" /etc/echo/qwen-route.env
 
-sudo -u postgres psql -d echo -v alias_digest="$alias_digest" -f "$release_dir/register.sql" >/dev/null
+sudo -u postgres psql -d echo -v alias_digest="$alias_digest" \
+  <"$release_dir/register.sql" >/dev/null
 
 systemctl enable echo-qwen-route.service >/dev/null
 systemctl restart echo-qwen-route.service
