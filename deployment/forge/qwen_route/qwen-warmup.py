@@ -18,7 +18,7 @@ DIGEST = os.environ.get(
 )
 ALIAS_DIGEST = os.environ.get("QWEN_ALIAS_DIGEST", "")
 CONTEXT = int(os.environ.get("QWEN_CONTEXT_LENGTH", "131072"))
-MODEL_BYTES = int(os.environ.get("QWEN_MODEL_BYTES", "23152946049"))
+MODEL_BYTES = int(os.environ.get("QWEN_MODEL_BYTES", "23152925077"))
 
 
 def request(path: str, body: dict | None = None, timeout: float = 1200) -> dict:

@@ -43,7 +43,7 @@ EXPECTED_ALIAS_DIGEST = os.environ.get(
     "a8b6dbff993304b29040d734ebc2d118b212e23feec64e0343fff85d9c02c5b0",
 )
 EXPECTED_CONTEXT = int(os.environ.get("QWEN_CONTEXT_LENGTH", "131072"))
-EXPECTED_MODEL_BYTES = int(os.environ.get("QWEN_MODEL_BYTES", "23152946049"))
+EXPECTED_MODEL_BYTES = int(os.environ.get("QWEN_MODEL_BYTES", "23152925077"))
 EXPECTED_GPU_COUNT = int(os.environ.get("QWEN_GPU_COUNT", "2"))
 OLLAMA_CONTAINER = os.environ.get("QWEN_OLLAMA_CONTAINER", "echo-ollama-qwen27b")
 NVIDIA_SMI = os.environ.get("QWEN_NVIDIA_SMI", "/usr/bin/nvidia-smi")
