@@ -42,5 +42,9 @@ systemctl restart echo-qwen-home.service
 if [[ -f /etc/systemd/system/echo-qwen-route.service ]]; then
   systemctl restart echo-qwen-route.service
 fi
+if [[ -f "$backup_dir/titlehound-before.state" ]] &&
+   grep -qx active "$backup_dir/titlehound-before.state"; then
+  systemctl start echo-titlehound.service
+fi
 docker volume inspect ollama_ollama_data >/dev/null
 printf 'QWEN_ROUTE_ROLLED_BACK backup=%s volume=ollama_ollama_data\n' "$backup_dir"

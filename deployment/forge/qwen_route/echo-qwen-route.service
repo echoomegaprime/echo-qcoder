@@ -3,6 +3,7 @@ Description=Fail-closed FORGE-local Qwen 27B 128K route
 After=network-online.target docker.service echo-qwen-home.service
 Wants=network-online.target
 Requires=echo-qwen-home.service
+Before=echo-titlehound.service
 
 [Service]
 Type=simple

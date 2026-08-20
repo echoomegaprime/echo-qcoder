@@ -57,6 +57,7 @@ backup_path /etc/echo/qwen-route.env qwen-route.env
 systemctl show echo-qwen-home.service -p FragmentPath -p DropInPaths -p Type -p RemainAfterExit -p Restart -p ActiveState -p SubState >"$backup_dir/systemd-before.txt" || true
 docker inspect echo-ollama-qwen27b >"$backup_dir/container-before.json" 2>/dev/null || true
 docker volume inspect "$volume" >"$backup_dir/volume-before.json"
+systemctl is-active echo-titlehound.service >"$backup_dir/titlehound-before.state" 2>/dev/null || true
 
 install -m 0644 "$source_root/docker-compose.yml" "$compose_dir/docker-compose.yml"
 install -m 0644 "$source_root/echo-qwen-home.service" /etc/systemd/system/echo-qwen-home.service
@@ -69,6 +70,7 @@ mv -Tf "$service_root/current.next" "$service_root/current"
 
 docker compose -f "$compose_dir/docker-compose.yml" config --quiet
 systemctl daemon-reload
+systemctl stop echo-titlehound.service 2>/dev/null || true
 systemctl enable echo-qwen-home.service >/dev/null
 systemctl restart echo-qwen-home.service
 
@@ -168,7 +170,7 @@ SQL
 compose_sha=$(sha256sum "$compose_dir/docker-compose.yml" | awk '{print $1}')
 unit_sha=$(sha256sum /etc/systemd/system/echo-qwen-route.service | awk '{print $1}')
 cat >"$service_root/deployment-receipt-$commit.json" <<EOF
-{"service":"echo-qwen-route","commit":"$commit","base_digest":"$base_digest","alias":"$alias","alias_digest":"$alias_digest","context_length":131072,"volume":"$volume","image":"ollama/ollama@sha256:57f573b47f1f71ebb445789f279fe3e596a8beab182f7cf486db9205bad87c5a","compose_sha256":"$compose_sha","unit_sha256":"$unit_sha","backup_dir":"$backup_dir","deployed_at":"$timestamp"}
+{"service":"echo-qwen-route","commit":"$commit","base_digest":"$base_digest","alias":"$alias","alias_digest":"$alias_digest","context_length":131072,"volume":"$volume","image":"ollama/ollama@sha256:57f573b47f1f71ebb445789f279fe3e596a8beab182f7cf486db9205bad87c5a","compose_sha256":"$compose_sha","unit_sha256":"$unit_sha","gpu_conflict_parked":"echo-titlehound.service","backup_dir":"$backup_dir","deployed_at":"$timestamp"}
 EOF
 chown forge:forge "$service_root/deployment-receipt-$commit.json"
 printf 'QWEN_ROUTE_DEPLOYED commit=%s alias_digest=%s context=131072 volume=%s backup=%s\n' "$commit" "$alias_digest" "$volume" "$backup_dir"

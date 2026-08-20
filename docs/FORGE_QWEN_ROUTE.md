@@ -7,7 +7,7 @@ The model runtime and the governed caller route are deliberately separate:
 - Raw Ollama: `http://127.0.0.1:11436`, reachable only inside FORGE.
 - Governed gateway: `http://127.0.0.1:11437` and LAN `http://192.168.1.220:11437`.
 - Stable model alias: `c3po-code:echo-abliterated-128k`.
-- Staged alias digest: `a8b6dbff993304b29040d734ebc2d118b212e23feec64e0343fff85d9c02c5b0` (captured again into every deployment receipt).
+- Staged alias digest: `79a403304f7a0ece0f1239482fcb484bb3509aa4234b68f881280936651f77a9` (captured again into every deployment receipt).
 - Exact parent: `huihui_ai/Qwen3.6-abliterated:27b`.
 - Exact parent digest: `418838acbea7dad6eca43e2f74519307235e62b584e08ab7a6e7d6916cff7507`.
 - Context: exactly 131,072 tokens.
@@ -27,7 +27,7 @@ Former `qcoder-32k` and `qcoder-64k` tags may remain in the persistent Ollama vo
 
 1. the stable alias exists at its deployment-recorded exact digest;
 2. `/api/show` reports the exact parent model and `num_ctx 131072`;
-3. `/api/ps` reports the exact stable-alias digest, exact context, exact model byte size, and `size_vram == size`;
+3. `/api/ps` reports the exact stable-alias digest, exact context, a positive resident size, and `size_vram == size`;
 4. the pinned Docker container is running, not OOM-killed, and healthy;
 5. an Ollama runner process is resident on exactly two GPUs;
 6. `QWEN_RELEASE_SHA` is an exact lowercase 40-hex tracked release commit.
@@ -51,6 +51,17 @@ prompt_eval_count
 An over-budget request receives HTTP 413 with all counts. The requested generation must report exactly the same `prompt_eval_count` as preflight; drift returns HTTP 502. Responses and headers expose prompt count, reserves, remaining capacity, `truncated:false`, and `shifted:false`.
 
 The gateway permits one active model request and one queued request. A third concurrent request receives HTTP 429 with a retry hint. Ollama is also configured with `OLLAMA_NUM_PARALLEL=1`; there is no ambiguous 32K/64K alias fallback.
+
+## Dedicated GPU lease
+
+The 131072-token runner needs both FORGE GPUs and cannot coexist with the
+GPU0-resident TitleHound vLLM without CPU offload. Promotion therefore records
+and parks `echo-titlehound.service` before restarting the Qwen container. The
+Qwen route is ordered before TitleHound at boot, so its `ExecStartPre` exact
+prewarm acquires and verifies both GPUs before TitleHound's own admission gate
+can run. Readiness remains red if any later workload causes even partial CPU
+offload. Rollback restores TitleHound only when it was active before the
+corresponding deployment backup was captured.
 
 ## Surfaces
 
@@ -108,7 +119,7 @@ It first unloads the model and requires cold readiness to turn red, records the 
 
 The Ollama image is pinned to `ollama/ollama@sha256:57f573b47f1f71ebb445789f279fe3e596a8beab182f7cf486db9205bad87c5a`. The external volume remains `ollama_ollama_data`; provisioning never removes a model or volume. `echo-qwen-home.service` is `Type=simple`, blocks in `docker wait`, and uses `Restart=always`, so systemd follows actual container liveness instead of remaining falsely green after a oneshot Compose launch.
 
-Every install backs up the previous Compose file, units, drop-in, route environment, container inspection, and volume inspection under:
+Every install backs up the previous Compose file, units, drop-in, route environment, container inspection, volume inspection, and prior TitleHound activity state under:
 
 ```text
 /home/forge/services/qwen-route/backups/<UTC timestamp>/

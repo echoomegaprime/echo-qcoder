@@ -30,6 +30,7 @@ class DeploymentContractTests(unittest.TestCase):
         self.assertIn("--remove-orphans qwen", supervisor)
         self.assertIn("--host 127.0.0.1 --port 11437", route)
         self.assertIn("Requires=echo-qwen-home.service", route)
+        self.assertIn("Before=echo-titlehound.service", route)
 
     def test_registry_names_local_provider_and_never_cloud(self) -> None:
         sql = (ROOT / "register.sql").read_text()
@@ -62,12 +63,17 @@ class DeploymentContractTests(unittest.TestCase):
 
     def test_installer_invokes_the_shared_provisioner_through_bash(self) -> None:
         installer = (ROOT / "install-qwen-route.sh").read_text()
+        rollback = (ROOT / "rollback-qwen-route.sh").read_text()
         self.assertIn(
             '/usr/bin/bash "$repo_root/deployment/forge/provision-qcoder-model.sh"',
             installer,
         )
         self.assertIn('<"$release_dir/register.sql"', installer)
         self.assertNotIn('-f "$release_dir/register.sql"', installer)
+        self.assertIn("systemctl stop echo-titlehound.service", installer)
+        self.assertIn("titlehound-before.state", installer)
+        self.assertIn("systemctl start echo-titlehound.service", rollback)
+        self.assertIn("titlehound-before.state", rollback)
 
     def test_shared_provisioner_preserves_named_parent_through_structured_api(self) -> None:
         provisioner = (ROOT.parent / "provision-qcoder-model.sh").read_text()
