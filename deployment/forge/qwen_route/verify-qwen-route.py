@@ -171,7 +171,7 @@ def context_canary(base: str, target_tokens: int) -> dict:
         "messages": [{"role": "user", "content": content}],
         "reasoning_effort": "none",
         "stream": False,
-        "max_tokens": 512,
+        "max_tokens": 4096,
         "temperature": 0,
     }
     status, payload, elapsed, _ = call(base, "/v1/chat/completions", body)
@@ -184,6 +184,11 @@ def context_canary(base: str, target_tokens: int) -> dict:
     route = payload.get("route_metadata", {})
     if route.get("truncated") is not False or route.get("shifted") is not False:
         raise AssertionError("long-context response did not prove no truncation/no shift")
+    response_budget = route.get("budget", {})
+    if response_budget.get("output_reserve_tokens") != 4096:
+        raise AssertionError("long-context generation did not preserve the 4096-token output reserve")
+    if response_budget.get("total_reserved_tokens", EXPECTED_CONTEXT + 1) > EXPECTED_CONTEXT:
+        raise AssertionError("long-context generation exceeded the admitted budget")
     return {
         "target_tokens": target_tokens,
         "prompt_tokens": payload.get("usage", {}).get("prompt_tokens"),
