@@ -112,7 +112,7 @@ import json
 import sys
 import urllib.request
 
-with urllib.request.urlopen("http://127.0.0.1:11436/api/tags", timeout=10) as response:
+with urllib.request.urlopen("http://127.0.0.1:11438/api/tags", timeout=10) as response:
     payload = json.load(response)
 value = next((item.get("digest", "") for item in payload.get("models", []) if item.get("name") == sys.argv[1]), "")
 print(value)
@@ -124,7 +124,7 @@ if [[ ! "$alias_digest" =~ ^[0-9a-f]{64}$ ]]; then
 fi
 
 cat >"$backup_dir/qwen-route.env.new" <<EOF
-QWEN_UPSTREAM=http://127.0.0.1:11436
+QWEN_UPSTREAM=http://127.0.0.1:11438
 QWEN_MODEL_ALIAS=$alias
 QWEN_BASE_MODEL=huihui_ai/Qwen3.6-abliterated:27b
 QWEN_BASE_DIGEST=$base_digest

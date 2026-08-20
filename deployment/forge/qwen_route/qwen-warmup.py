@@ -10,7 +10,7 @@ import urllib.error
 import urllib.request
 
 
-UPSTREAM = os.environ.get("QWEN_UPSTREAM", "http://127.0.0.1:11436").rstrip("/")
+UPSTREAM = os.environ.get("QWEN_UPSTREAM", "http://127.0.0.1:11438").rstrip("/")
 MODEL = os.environ.get("QWEN_MODEL_ALIAS", "c3po-code:echo-abliterated-128k")
 DIGEST = os.environ.get(
     "QWEN_BASE_DIGEST",

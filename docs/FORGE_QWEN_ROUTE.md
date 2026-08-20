@@ -4,7 +4,7 @@
 
 The model runtime and the governed caller route are deliberately separate:
 
-- Raw Ollama: `http://127.0.0.1:11436`, reachable only inside FORGE.
+- Raw Ollama: `http://127.0.0.1:11438`, reachable only inside FORGE.
 - Governed gateway: `http://127.0.0.1:11437` and LAN `http://192.168.1.220:11437`.
 - Stable model alias: `c3po-code:echo-abliterated-128k`.
 - Staged alias digest: `79a403304f7a0ece0f1239482fcb484bb3509aa4234b68f881280936651f77a9` (captured again into every deployment receipt).
@@ -14,7 +14,7 @@ The model runtime and the governed caller route are deliberately separate:
 - Mode: nonthinking (`think:false`, OpenAI `reasoning_effort:"none"`).
 
 Consumers use the governed `/ready` endpoint on port `11437`; raw Ollama on
-`11436` is not a readiness surface. The response publishes the exact
+`11438` is not a readiness surface. The response publishes the exact
 `base_model`, `sha256:`-prefixed `base_digest`, `context_length`, `resident`,
 `truncate`, `shift`, and tracked `release_sha` so callers can enforce the full
 runtime contract without inferring identity from a status code.

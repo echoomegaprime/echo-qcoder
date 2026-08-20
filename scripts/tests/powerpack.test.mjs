@@ -106,7 +106,7 @@ test("FORGE model provisioning pins one exact 128K derivative without deleting m
   assert.match(provisioning, /target_model=.*c3po-code:echo-abliterated-128k/u);
   assert.match(provisioning, /context_length=.*131072/u);
   assert.match(provisioning, /source_digest=.*418838acbea7/u);
-  assert.match(provisioning, /127\.0\.0\.1:11436\/api\/create/u);
+  assert.match(provisioning, /127\.0\.0\.1:11438\/api\/create/u);
   assert.match(provisioning, /"from": source/u);
   assert.match(provisioning, /"parameters": \{"num_ctx": context\}/u);
   assert.match(provisioning, /payload\.get\("status"\) != "success"/u);

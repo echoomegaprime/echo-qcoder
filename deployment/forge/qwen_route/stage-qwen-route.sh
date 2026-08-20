@@ -15,7 +15,7 @@ fi
 alias_digest=$(python3 - <<'PY'
 import json
 import urllib.request
-with urllib.request.urlopen("http://127.0.0.1:11436/api/tags", timeout=10) as response:
+with urllib.request.urlopen("http://127.0.0.1:11438/api/tags", timeout=10) as response:
     payload=json.load(response)
 print(next((item.get("digest", "") for item in payload.get("models", []) if item.get("name") == "c3po-code:echo-abliterated-128k"), ""))
 PY
@@ -26,7 +26,7 @@ if [[ ! "$alias_digest" =~ ^[0-9a-f]{64}$ ]]; then
 fi
 
 sudo -u forge env \
-  QWEN_UPSTREAM=http://127.0.0.1:11436 \
+  QWEN_UPSTREAM=http://127.0.0.1:11438 \
   QWEN_MODEL_ALIAS=c3po-code:echo-abliterated-128k \
   QWEN_BASE_DIGEST=418838acbea7dad6eca43e2f74519307235e62b584e08ab7a6e7d6916cff7507 \
   QWEN_ALIAS_DIGEST="$alias_digest" \
@@ -44,7 +44,7 @@ systemd-run \
   --working-directory="$source_root" \
   --property=Restart=on-failure \
   --property=RestartSec=3s \
-  --setenv=QWEN_UPSTREAM=http://127.0.0.1:11436 \
+  --setenv=QWEN_UPSTREAM=http://127.0.0.1:11438 \
   --setenv=QWEN_MODEL_ALIAS=c3po-code:echo-abliterated-128k \
   --setenv=QWEN_BASE_MODEL=huihui_ai/Qwen3.6-abliterated:27b \
   --setenv=QWEN_BASE_DIGEST=418838acbea7dad6eca43e2f74519307235e62b584e08ab7a6e7d6916cff7507 \

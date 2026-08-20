@@ -6,7 +6,7 @@ services:
     container_name: echo-ollama-qwen27b
     restart: unless-stopped
     ports:
-      - "127.0.0.1:11436:11434"
+      - "127.0.0.1:11438:11434"
     volumes:
       - ollama_ollama_data:/root/.ollama
     environment:

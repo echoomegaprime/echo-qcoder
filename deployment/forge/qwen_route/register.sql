@@ -70,7 +70,7 @@ VALUES (
   'http://127.0.0.1:11437/v1',
   jsonb_build_object(
     'route_kind', 'local_loopback_gateway',
-    'raw_ollama', 'http://127.0.0.1:11436',
+    'raw_ollama', 'http://127.0.0.1:11438',
     'model_alias', 'c3po-code:echo-abliterated-128k',
     'base_model', 'huihui_ai/Qwen3.6-abliterated:27b',
     'base_digest', '418838acbea7dad6eca43e2f74519307235e62b584e08ab7a6e7d6916cff7507',

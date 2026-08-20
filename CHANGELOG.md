@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Replaced active 32K/64K alias selection with the single stable `c3po-code:echo-abliterated-128k` route.
-- Added the fail-closed FORGE gateway on port 11437 over loopback-only Ollama port 11436, with exact digest/context/two-GPU readiness, authoritative no-truncate/no-shift token admission, explicit wrapper/tool/output reserves, single-flight backpressure, bounded metrics, and native/OpenAI nonthinking surfaces.
+- Added the fail-closed FORGE gateway on port 11437 over isolated loopback-only Ollama port 11438, with exact digest/context/two-GPU readiness, authoritative no-truncate/no-shift token admission, explicit wrapper/tool/output reserves, single-flight backpressure, bounded metrics, and native/OpenAI nonthinking surfaces.
 - Added pinned Compose/systemd lifecycle supervision, Docker log rotation, staging-first deployment, exact rollback receipts, SDK/model-registry registration, and deterministic long-context/recovery canaries.
 
 ## 0.3.0 - 2026-08-09

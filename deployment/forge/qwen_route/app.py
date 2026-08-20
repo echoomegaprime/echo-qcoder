@@ -1,6 +1,6 @@
 """Fail-closed, single-flight gateway for the FORGE-local Qwen 27B runtime.
 
-The raw Ollama daemon remains private on 127.0.0.1:11436.  This gateway is
+The raw Ollama daemon remains private on 127.0.0.1:11438.  This gateway is
 the only supported caller-facing route.  It verifies the exact resident
 model and GPU placement, performs an authoritative tokenizer preflight via
 Ollama with truncation and context shifting disabled, and never logs prompt
@@ -29,7 +29,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 
 SERVICE = "echo-qwen-route"
 VERSION = "1.0.0"
-UPSTREAM = os.environ.get("QWEN_UPSTREAM", "http://127.0.0.1:11436").rstrip("/")
+UPSTREAM = os.environ.get("QWEN_UPSTREAM", "http://127.0.0.1:11438").rstrip("/")
 MODEL_ALIAS = os.environ.get("QWEN_MODEL_ALIAS", "c3po-code:echo-abliterated-128k")
 BASE_MODEL = os.environ.get(
     "QWEN_BASE_MODEL", "huihui_ai/Qwen3.6-abliterated:27b"
@@ -415,7 +415,7 @@ async def _runtime_health(*, use_cache: bool = True) -> dict[str, Any]:
         "service": SERVICE,
         "version": VERSION,
         "route": "forge-local-qwen",
-        "upstream": "127.0.0.1:11436",
+        "upstream": "127.0.0.1:11438",
         "model": MODEL_ALIAS,
         "base_model": BASE_MODEL,
         "base_digest": f"sha256:{EXPECTED_BASE_DIGEST}",

@@ -12,7 +12,7 @@ class DeploymentContractTests(unittest.TestCase):
     def test_compose_pins_image_loopback_volume_gpu_and_log_rotation(self) -> None:
         compose = (ROOT / "docker-compose.yml").read_text()
         self.assertIn("name: echo-qwen-home", compose)
-        self.assertIn("127.0.0.1:11436:11434", compose)
+        self.assertIn("127.0.0.1:11438:11434", compose)
         self.assertIn("ollama/ollama@sha256:57f573", compose)
         self.assertIn("name: ollama_ollama_data", compose)
         self.assertIn('device_ids: ["0", "1"]', compose)
@@ -88,7 +88,7 @@ class DeploymentContractTests(unittest.TestCase):
 
     def test_shared_provisioner_preserves_named_parent_through_structured_api(self) -> None:
         provisioner = (ROOT.parent / "provision-qcoder-model.sh").read_text()
-        self.assertIn("127.0.0.1:11436/api/create", provisioner)
+        self.assertIn("127.0.0.1:11438/api/create", provisioner)
         self.assertIn('"from": source', provisioner)
         self.assertIn('"parameters": {"num_ctx": context}', provisioner)
         self.assertIn('if [[ "$actual_parent" != "$source_model" ]]', provisioner)

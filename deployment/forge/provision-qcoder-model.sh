@@ -26,7 +26,7 @@ import json
 import sys
 import urllib.request
 
-with urllib.request.urlopen("http://127.0.0.1:11436/api/tags", timeout=10) as response:
+with urllib.request.urlopen("http://127.0.0.1:11438/api/tags", timeout=10) as response:
     payload = json.load(response)
 model = sys.argv[1]
 print(next((item.get("digest", "") for item in payload.get("models", []) if item.get("name") == model), ""))
@@ -55,7 +55,7 @@ body = json.dumps(
     separators=(",", ":"),
 ).encode()
 request = urllib.request.Request(
-    "http://127.0.0.1:11436/api/create",
+    "http://127.0.0.1:11438/api/create",
     data=body,
     headers={"Content-Type": "application/json"},
 )
@@ -81,7 +81,7 @@ import urllib.request
 
 body = json.dumps({"model": sys.argv[1]}).encode()
 request = urllib.request.Request(
-    "http://127.0.0.1:11436/api/show",
+    "http://127.0.0.1:11438/api/show",
     data=body,
     headers={"Content-Type": "application/json"},
 )
