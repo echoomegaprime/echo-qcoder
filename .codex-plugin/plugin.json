@@ -1,0 +1,32 @@
+{
+  "name": "echo-qcoder-console",
+  "version": "0.3.0",
+  "description": "Private governed control surface for ECHO QCoder builder sessions.",
+  "author": {
+    "name": "ECHO OMEGA PRIME",
+    "email": "bobbymcwilliams@echo-op.com",
+    "url": "https://github.com/ECHO-OMEGA-PRIME"
+  },
+  "homepage": "https://github.com/ECHO-OMEGA-PRIME/echo-qcoder",
+  "repository": "https://github.com/ECHO-OMEGA-PRIME/echo-qcoder",
+  "license": "MIT",
+  "keywords": ["qcoder", "qwen", "mcp", "builder", "terminal"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "QCoder Console",
+    "shortDescription": "Control governed local QCoder builder sessions.",
+    "longDescription": "Start, inspect, steer, and stop governed QCoder sessions without exposing a raw shell.",
+    "developerName": "ECHO OMEGA PRIME",
+    "category": "Developer tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "composerIcon": "./assets/qcoder-mark.svg",
+    "logo": "./assets/qcoder-logo.svg",
+    "defaultPrompt": [
+      "Show my QCoder sessions.",
+      "Start QCoder on this repository's failing tests.",
+      "Open the live QCoder console."
+    ],
+    "brandColor": "#14B8A6"
+  }
+}
