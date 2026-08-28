@@ -1,7 +1,7 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
-    [ValidateSet('Core', 'Semantic', 'IssueSolver', 'Evaluation')]
-    [string[]]$Component = @('Core', 'Semantic', 'IssueSolver', 'Evaluation'),
+    [ValidateSet('Semantic', 'IssueSolver', 'Evaluation')]
+    [string[]]$Component = @('Semantic', 'IssueSolver', 'Evaluation'),
     [switch]$Force,
     [switch]$SkipSkills
 )
@@ -56,40 +56,6 @@ New-Item -ItemType Directory -Path $uvCache -Force | Out-Null
 $priorUvCache = $env:UV_CACHE_DIR
 $env:UV_CACHE_DIR = $uvCache
 try {
-    if ($Component -contains 'Core') {
-        if (-not (Get-Command npm -CommandType Application -ErrorAction SilentlyContinue)) {
-            throw 'npm is required for the pinned Qwen Code installation.'
-        }
-        $qwenPackage = Get-PinnedPackage -Id 'qwen-code'
-        $expectedQwenVersion = ($qwenPackage -split '@')[-1]
-        $qwenCommand = Get-Command qwen -ErrorAction SilentlyContinue | Select-Object -First 1
-        $qwenExecutable = if ($qwenCommand) { $qwenCommand.Source } else { $null }
-        $installedQwenVersion = if ($qwenExecutable) {
-            (& $qwenExecutable --version 2>&1 | Select-Object -First 1).Trim()
-        } else {
-            $null
-        }
-        if ($Force -or $installedQwenVersion -ne $expectedQwenVersion) {
-            if ($PSCmdlet.ShouldProcess($qwenPackage, 'Install the pinned Qwen Code core')) {
-                $npmArgs = @('install', '--global')
-                if ($qwenExecutable) {
-                    $qwenPrefix = Split-Path -Parent $qwenExecutable
-                    if ((Split-Path -Leaf $qwenPrefix) -eq 'bin') { $qwenPrefix = Split-Path -Parent $qwenPrefix }
-                    $npmArgs += @('--prefix', $qwenPrefix)
-                }
-                $npmArgs += @('--save-exact', '--no-audit', '--no-fund', $qwenPackage)
-                Invoke-Checked -FilePath 'npm' -ArgumentList $npmArgs
-            }
-        }
-        $qwenCommand = Get-Command qwen -ErrorAction SilentlyContinue | Select-Object -First 1
-        if (-not $qwenCommand) { throw 'Qwen Code executable was not found after installation.' }
-        $installedQwenVersion = (& $qwenCommand.Source --version 2>&1 | Select-Object -First 1).Trim()
-        if ($LASTEXITCODE -ne 0 -or $installedQwenVersion -ne $expectedQwenVersion) {
-            throw "Qwen Code version mismatch: expected $expectedQwenVersion, observed $installedQwenVersion"
-        }
-        Write-Host "QWEN_CODE_OK version=$installedQwenVersion"
-    }
-
     if ($Component -contains 'Semantic') {
         if (-not (Get-Command uv -CommandType Application -ErrorAction SilentlyContinue)) {
             throw 'uv is required for the pinned Serena installation.'

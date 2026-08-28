@@ -4,8 +4,6 @@ dist/
 coverage/
 .vite/
 *.tsbuildinfo
-__pycache__/
-*.py[cod]
 
 # Local configuration and secrets
 .env
@@ -36,4 +34,3 @@ artifacts/
 Thumbs.db
 .idea/
 .vscode/
-*.bundle

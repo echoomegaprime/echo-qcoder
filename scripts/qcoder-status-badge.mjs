@@ -15,7 +15,7 @@ const outJson = join(outDir, "qcoder-status-badge.json");
 
 const checked_at = new Date().toISOString();
 let ok = false;
-let detail;
+let detail = "unreachable";
 let statusCode = 0;
 
 try {

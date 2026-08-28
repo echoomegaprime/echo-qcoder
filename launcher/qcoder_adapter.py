@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import NamedTuple, Sequence
 
 
-DEFAULT_MODEL = "c3po-code:qcoder-128k"
+DEFAULT_MODEL = "c3po-code:latest"
 DEFAULT_BASE_URL = "http://192.168.1.220:11434/v1"
 DEFAULT_API_KEY = "local-qcoder"
 
@@ -120,7 +120,6 @@ def build_qwen_arguments(
     if approval_mode not in {"auto-edit", "yolo"}:
         raise ValueError("qcoder approval mode must be auto-edit or yolo")
 
-    output_format = "stream-json" if invocation.mode == "headless" else "text"
     result = [
         "--model",
         qwen_model,
@@ -133,7 +132,7 @@ def build_qwen_arguments(
         "--approval-mode",
         approval_mode,
         "--output-format",
-        output_format,
+        "text",
     ]
     for directory in invocation.include_directories:
         result.extend(["--include-directories", str(directory)])
@@ -303,44 +302,14 @@ def _create_windows_kill_on_close_job() -> int:
     return int(job)
 
 
-def render_qwen_stream_line(line: str) -> str | None:
-    """Reduce Qwen stream-json to model-visible text without leaking hidden reasoning."""
-    try:
-        payload = json.loads(line)
-    except json.JSONDecodeError:
-        stripped = line.rstrip("\r\n")
-        return stripped or None
-
-    if payload.get("type") == "assistant":
-        message = payload.get("message")
-        if not isinstance(message, dict):
-            return None
-        content = message.get("content")
-        if not isinstance(content, list):
-            return None
-        text_parts = [
-            item.get("text", "")
-            for item in content
-            if isinstance(item, dict) and item.get("type") == "text"
-        ]
-        rendered = "".join(text_parts).strip()
-        return rendered or None
-
-    if payload.get("type") == "result" and payload.get("is_error"):
-        result = str(payload.get("result") or "unknown Qwen failure").strip()
-        return f"QCoder error: {result}"
-    return None
-
-
 def run_supervised_process(
     command: Sequence[str],
     *,
     cwd: Path,
     environment: dict[str, str],
-    filter_stream_json: bool = False,
 ) -> int:
     """Run Qwen so a terminated launcher cannot leave orphan model requests."""
-    if os.name != "nt" and not filter_stream_json:
+    if os.name != "nt":
         return subprocess.run(
             list(command),
             cwd=cwd,
@@ -348,25 +317,12 @@ def run_supervised_process(
             check=False,
         ).returncode
 
-    creationflags = subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0
     process = subprocess.Popen(
         list(command),
         cwd=cwd,
         env=environment,
-        creationflags=creationflags,
-        stdout=subprocess.PIPE if filter_stream_json else None,
-        text=filter_stream_json,
-        encoding="utf-8" if filter_stream_json else None,
-        errors="replace" if filter_stream_json else None,
+        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
     )
-    if os.name != "nt":
-        assert process.stdout is not None
-        for line in process.stdout:
-            rendered = render_qwen_stream_line(line)
-            if rendered:
-                print(rendered, flush=True)
-        return process.wait()
-
     job = _create_windows_kill_on_close_job()
     kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel32.AssignProcessToJobObject.argtypes = [wintypes.HANDLE, wintypes.HANDLE]
@@ -380,12 +336,6 @@ def run_supervised_process(
         kernel32.CloseHandle(job)
         raise ctypes.WinError(error)
     try:
-        if filter_stream_json:
-            assert process.stdout is not None
-            for line in process.stdout:
-                rendered = render_qwen_stream_line(line)
-                if rendered:
-                    print(rendered, flush=True)
         return process.wait()
     finally:
         kernel32.CloseHandle(job)
@@ -422,7 +372,6 @@ def main(arguments: Sequence[str] | None = None) -> int:
         [executable, *qwen_arguments],
         cwd=invocation.workspace,
         environment=environment,
-        filter_stream_json=invocation.mode == "headless",
     )
 
 

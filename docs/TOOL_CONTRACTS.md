@@ -87,7 +87,7 @@
 12. **Retry:** only with the same idempotency key.
 13. **Confirmation:** host write confirmation applies; preview is the first stage.
 14. **UI resource:** none; render separately.
-15. **Annotations:** `readOnlyHint=false`, `destructiveHint=true`, `openWorldHint=true`, `idempotentHint=true`.
+15. **Annotations:** `readOnlyHint=false`, `destructiveHint=false`, `openWorldHint=true`, `idempotentHint=true`.
 16. **Security scheme:** `oauth2` with `qcoder.sessions.start`.
 
 ## 5. `send_qcoder_task`
@@ -106,7 +106,7 @@
 12. **Retry:** bounded and same key only.
 13. **Confirmation:** host write confirmation applies.
 14. **UI resource:** none; widget may call it through MCP Apps `tools/call`.
-15. **Annotations:** `readOnlyHint=false`, `destructiveHint=true`, `openWorldHint=true`, `idempotentHint=true`.
+15. **Annotations:** `readOnlyHint=false`, `destructiveHint=false`, `openWorldHint=true`, `idempotentHint=true`.
 16. **Security scheme:** `oauth2` with `qcoder.sessions.write`.
 
 ## 6. `stop_qcoder_session`

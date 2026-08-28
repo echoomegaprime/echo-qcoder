@@ -110,7 +110,7 @@ class QwenArgumentTests(unittest.TestCase):
         )
         args = adapter.build_qwen_arguments(
             invocation,
-            qwen_model="c3po-code:qcoder-32k",
+            qwen_model="c3po-code:latest",
             base_url="http://127.0.0.1:11434/v1",
             api_key="local-qcoder",
         )
@@ -120,11 +120,9 @@ class QwenArgumentTests(unittest.TestCase):
         self.assertIn("--openai-base-url", args)
         self.assertIn("http://127.0.0.1:11434/v1", args)
         self.assertIn("--model", args)
-        self.assertIn("c3po-code:qcoder-32k", args)
+        self.assertIn("c3po-code:latest", args)
         self.assertIn("--approval-mode", args)
         self.assertIn("yolo", args)
-        output_index = args.index("--output-format")
-        self.assertEqual(args[output_index + 1], "stream-json")
         self.assertIn("-p", args)
         self.assertEqual(args[-1], "build")
 
@@ -147,33 +145,7 @@ class QwenArgumentTests(unittest.TestCase):
 
         self.assertNotIn("-p", args)
         self.assertIn("--prompt-interactive", args)
-        output_index = args.index("--output-format")
-        self.assertEqual(args[output_index + 1], "text")
         self.assertEqual(args[-1], "bootstrap")
-
-    def test_stream_json_renderer_emits_only_assistant_text(self) -> None:
-        adapter = load_adapter()
-        assistant_line = (
-            '{"type":"assistant","message":{"content":['
-            '{"type":"thinking","thinking":"hidden"},'
-            '{"type":"text","text":"VISIBLE"}]}}'
-        )
-        system_line = '{"type":"system","subtype":"init"}'
-
-        self.assertEqual(adapter.render_qwen_stream_line(assistant_line), "VISIBLE")
-        self.assertIsNone(adapter.render_qwen_stream_line(system_line))
-
-    def test_stream_json_renderer_surfaces_result_errors(self) -> None:
-        adapter = load_adapter()
-        error_line = (
-            '{"type":"result","subtype":"error","is_error":true,'
-            '"result":"context unavailable"}'
-        )
-
-        self.assertEqual(
-            adapter.render_qwen_stream_line(error_line),
-            "QCoder error: context unavailable",
-        )
 
     def test_continue_latest_uses_qwen_continue_flag(self) -> None:
         adapter = load_adapter()
@@ -190,12 +162,12 @@ class QwenArgumentTests(unittest.TestCase):
         invocation = adapter.parse_codex_invocation(["-C", r"C:\work", "bootstrap"])
         summary = adapter.safe_invocation_summary(
             invocation,
-            qwen_model="c3po-code:qcoder-32k",
+            qwen_model="c3po-code:latest",
             base_url="http://127.0.0.1:11434/v1",
         )
 
         self.assertNotIn(os.environ.get("OPENAI_API_KEY", "secret-never-print"), summary)
-        self.assertIn("c3po-code:qcoder-32k", summary)
+        self.assertIn("c3po-code:latest", summary)
 
     def test_qwen_environment_extends_slow_local_model_timeout(self) -> None:
         adapter = load_adapter()

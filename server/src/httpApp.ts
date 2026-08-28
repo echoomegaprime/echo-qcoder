@@ -61,7 +61,7 @@ export function createHttpApp(dependencies: HttpAppDependencies) {
     response.status(ready ? 200 : 503).json({ status: ready ? "ready" : "not_ready" });
   });
   app.get("/version", (_request, response) =>
-    response.json({ name: "echo-qcoder-console", version: "0.3.0", protocol: "streamable-http" }),
+    response.json({ name: "echo-qcoder-console", version: "0.2.0", protocol: "streamable-http" }),
   );
   app.get("/.well-known/oauth-protected-resource/oauth-mcp-qcoder-v1", (_request, response) =>
     response.json({

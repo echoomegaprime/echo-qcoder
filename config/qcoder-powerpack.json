@@ -10,42 +10,6 @@
   },
   "repositories": [
     {
-      "id": "qwen-code",
-      "repository": "QwenLM/qwen-code",
-      "source": "https://github.com/QwenLM/qwen-code",
-      "commit": "55e20db328248436ae65743986906ff1fbc5ea58",
-      "branch": "main",
-      "license": "Apache-2.0",
-      "licensePath": "LICENSE",
-      "licenseSha256": "55367b61ccd2a016a0159ad886bd66a3ee6cb5e873d0c75c803c897dd245b075",
-      "package": "@qwen-code/qwen-code@0.21.8",
-      "posture": "integrated",
-      "capabilities": [
-        "terminal-coding-agent",
-        "skills",
-        "mcp-client",
-        "checkpointed-autonomy",
-        "worktree-workflows"
-      ]
-    },
-    {
-      "id": "qwen-agent",
-      "repository": "QwenLM/Qwen-Agent",
-      "source": "https://github.com/QwenLM/Qwen-Agent",
-      "commit": "31a4d36d123688581a9e9744427272b33ce940e0",
-      "branch": "main",
-      "license": "Apache-2.0",
-      "licensePath": "LICENSE",
-      "licenseSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
-      "posture": "sidecar",
-      "capabilities": [
-        "function-calling",
-        "rag",
-        "mcp-routing",
-        "sandboxed-code-interpreter-patterns"
-      ]
-    },
-    {
       "id": "serena",
       "repository": "oraios/serena",
       "source": "https://github.com/oraios/serena",
@@ -105,7 +69,7 @@
       "id": "openhands-agent-sdk",
       "repository": "OpenHands/software-agent-sdk",
       "source": "https://github.com/OpenHands/software-agent-sdk",
-      "commit": "684ea6a07041b8d049813e375675821a57fdf5ed",
+      "commit": "be6cd3b80b706bb14c91e604581a8de75cad61cc",
       "branch": "main",
       "license": "MIT",
       "licensePath": "LICENSE",
@@ -142,83 +106,6 @@
       "package": "browser-use==0.13.7",
       "posture": "reference",
       "capabilities": ["browser-recovery-loop", "domain-allowlists", "structured-browser-state"]
-    },
-    {
-      "id": "playwright-mcp",
-      "repository": "microsoft/playwright-mcp",
-      "source": "https://github.com/microsoft/playwright-mcp",
-      "commit": "7e0457a7cbf88823bf0146d12c46ae12c6818247",
-      "branch": "main",
-      "license": "Apache-2.0",
-      "licensePath": "LICENSE",
-      "licenseSha256": "9a7110fc2d2f964038e5dc49128f908f29f47a574c961cba16085914e879cbda",
-      "package": "@playwright/mcp@0.0.78",
-      "posture": "sidecar",
-      "capabilities": [
-        "accessibility-tree-browser-control",
-        "isolated-browser-profiles",
-        "bounded-origin-routing"
-      ]
-    },
-    {
-      "id": "spec-kit",
-      "repository": "github/spec-kit",
-      "source": "https://github.com/github/spec-kit",
-      "commit": "684b3d8e05263a7c1948d3d0699ab1cb4f77c3d5",
-      "branch": "main",
-      "license": "MIT",
-      "licensePath": "LICENSE",
-      "licenseSha256": "2510b446bc1f0cf9702453075d20cd88631e20e5642658edb7325d9c1eb534f7",
-      "posture": "reference",
-      "capabilities": [
-        "spec-driven-development",
-        "cross-artifact-analysis",
-        "acceptance-task-generation"
-      ]
-    },
-    {
-      "id": "markitdown",
-      "repository": "microsoft/markitdown",
-      "source": "https://github.com/microsoft/markitdown",
-      "commit": "fd239d5d2be43d9b68329730206b9312c7d5a388",
-      "branch": "main",
-      "license": "MIT",
-      "licensePath": "LICENSE",
-      "licenseSha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
-      "posture": "sidecar",
-      "capabilities": [
-        "document-to-markdown",
-        "office-document-ingestion",
-        "bounded-context-extraction"
-      ]
-    },
-    {
-      "id": "pr-agent",
-      "repository": "qodo-ai/pr-agent",
-      "source": "https://github.com/qodo-ai/pr-agent",
-      "commit": "064a305c8aac1543edf63b5a6baadcdd942831ac",
-      "branch": "main",
-      "license": "MIT",
-      "licensePath": "LICENSE",
-      "licenseSha256": "ea19f3b6bfd70ce0bf8d60fc5b15cdb789fcf86a63c0d6542977f888519f5788",
-      "posture": "reference",
-      "capabilities": ["pull-request-review", "change-description", "test-suggestion-patterns"]
-    },
-    {
-      "id": "superpowers",
-      "repository": "obra/superpowers",
-      "source": "https://github.com/obra/superpowers",
-      "commit": "44c9b2d6e889982ac18c27d05a19fefe335194e1",
-      "branch": "main",
-      "license": "MIT",
-      "licensePath": "LICENSE",
-      "licenseSha256": "a37e0e9697144819e1d965176ac4ae5bc3fa02d11e7812036bbcadf6dafe2400",
-      "posture": "reference",
-      "capabilities": [
-        "test-first-workflows",
-        "systematic-debugging",
-        "verification-before-completion"
-      ]
     },
     {
       "id": "nuclei",

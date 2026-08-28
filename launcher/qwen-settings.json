@@ -1,5 +1,5 @@
 {
-  "$version": 4,
+  "$version": 3,
   "context": {
     "fileName": ["AGENTS.md", "CLAUDE.md"]
   },
@@ -71,29 +71,24 @@
       "selectedType": "openai"
     }
   },
-  "tools": {
-    "shell": {
-      "enableInteractiveShell": false
-    }
-  },
   "model": {
-    "name": "c3po-code:echo-abliterated-32k"
+    "name": "c3po-code:latest"
   },
   "modelProviders": {
     "openai": [
       {
-        "id": "c3po-code:echo-abliterated-32k",
-        "name": "Shared 27B via echo-llm-broker (site+build, zero GPU lease, zero usage)",
-        "baseUrl": "http://192.168.1.220:11501/v1",
+        "id": "c3po-code:latest",
+        "name": "FORGE local uncensored Qwen 3.6 27B",
+        "baseUrl": "http://192.168.1.220:11434/v1",
         "envKey": "QCODER_LOCAL_API_KEY",
         "generationConfig": {
           "timeout": 900000,
           "maxRetries": 1,
-          "contextWindowSize": 131072,
+          "contextWindowSize": 8192,
           "samplingParams": {
             "temperature": 0.2,
             "top_p": 0.8,
-            "max_tokens": 4096
+            "max_tokens": 2048
           }
         }
       }
