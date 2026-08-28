@@ -77,14 +77,14 @@
     }
   },
   "model": {
-    "name": "c3po-code:qcoder-128k"
+    "name": "c3po-code:echo-abliterated-32k"
   },
   "modelProviders": {
     "openai": [
       {
-        "id": "c3po-code:qcoder-128k",
-        "name": "FORGE local uncensored Qwen 3.6 27B (64K QCoder context)",
-        "baseUrl": "http://192.168.1.220:11434/v1",
+        "id": "c3po-code:echo-abliterated-32k",
+        "name": "Shared 27B via echo-llm-broker (site+build, zero GPU lease, zero usage)",
+        "baseUrl": "http://192.168.1.220:11501/v1",
         "envKey": "QCODER_LOCAL_API_KEY",
         "generationConfig": {
           "timeout": 900000,
