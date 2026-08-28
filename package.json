@@ -19,6 +19,7 @@
     "format:check": "prettier --check .",
     "test": "npm run test --workspace server && npm run test --workspace web && node ./scripts/evaluate-golden.mjs && npm run test:powerpack",
     "test:powerpack": "node --test ./scripts/tests/*.test.mjs && node ./scripts/validate-powerpack.mjs && node ./scripts/validate-crucible-catalog.mjs",
+    "test:staged-plugin": "node ./scripts/staged-mcp-smoke.mjs",
     "test:coverage": "npm run test:coverage --workspace server && npm run test:coverage --workspace web",
     "verify": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run build"
   },

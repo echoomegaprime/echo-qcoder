@@ -18,6 +18,7 @@ Get-ChildItem -LiteralPath $root -Recurse -File -Include *.json | Where-Object {
 & npm run format:check; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & npm test; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & npm run build; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+& npm run test:staged-plugin; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & node .\scripts\validate-plugin.mjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & node .\scripts\validate-powerpack.mjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & node .\scripts\validate-crucible-catalog.mjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

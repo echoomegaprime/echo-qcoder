@@ -26,6 +26,8 @@ try {
     [IO.Compression.ZipFile]::ExtractToDirectory($archive, $validationTemp)
     & node (Join-Path $validationTemp 'scripts\validate-plugin.mjs') --archive
     if ($LASTEXITCODE -ne 0) { throw 'Packaged plugin contract validation failed.' }
+    & node (Join-Path $root 'scripts\staged-mcp-smoke.mjs') --plugin-root $validationTemp
+    if ($LASTEXITCODE -ne 0) { throw 'Packaged plugin MCP runtime smoke failed.' }
     $forbidden = @(Get-ChildItem -LiteralPath $validationTemp -Recurse -Force | Where-Object {
         $_.FullName -match '[\\/](node_modules|__pycache__|coverage|\.runtime|artifacts|logs)([\\/]|$)' -or
         $_.Name -match '\.(pyc|pyo|log|pid|sqlite3?|db)$'
