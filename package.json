@@ -25,12 +25,12 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "eslint": "10.8.1",
-    "globals": "16.5.0",
-    "jsdom": "29.1.1",
+    "eslint": "10.9.1",
+    "globals": "17.11.0",
+    "jsdom": "30.0.1",
     "prettier": "3.9.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "typescript-eslint": "8.66.0"
+    "typescript-eslint": "8.68.0"
   }
 }
