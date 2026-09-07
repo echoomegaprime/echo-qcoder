@@ -5,6 +5,6 @@
   "description": "Isolated, lockfile-pinned MCP Inspector used by QCoder protocol verification.",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/inspector": "2.1.0"
+    "@modelcontextprotocol/inspector": "2.5.0"
   }
 }
