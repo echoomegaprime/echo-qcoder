@@ -1,0 +1,15 @@
+{
+  "name": "echo-connectors",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Namespace-jailed MCP connectors for the ECHO OMEGA PRIME service suite. Zero dependencies.",
+  "main": "server.js",
+  "scripts": {
+    "smoke": "node smoke.js",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
