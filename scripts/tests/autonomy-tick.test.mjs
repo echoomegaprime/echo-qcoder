@@ -53,6 +53,12 @@ test("scheduled workflow reconciles one persistent autonomy issue", () => {
   assert.match(dependabot, /package-ecosystem: "github-actions"/u);
 });
 
+test("autonomy evidence identifies the canonical repository", () => {
+  const tick = readFileSync(resolve(root, "scripts/autonomy-tick.mjs"), "utf8");
+  assert.match(tick, /repository: "echoomegaprime\/echo-qcoder"/u);
+  assert.doesNotMatch(tick, /repository: "ECHO-OMEGA-PRIME\/echo-qcoder"/u);
+});
+
 test("HAMMER fallback installs a six-hour bounded task with issue reconciliation", () => {
   const installer = readFileSync(resolve(root, "scripts/install-autonomy-task.ps1"), "utf8");
   const runner = readFileSync(resolve(root, "scripts/run-autonomy-tick.ps1"), "utf8");
