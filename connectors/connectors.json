@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "generated_from": "arcanum_sdk.sdk_capabilities live probe 2026-08-10",
+  "connectors": {
+    "certforge": {
+      "title": "ECHO Certification Forge",
+      "summary": "Evidence-backed release authority. Admission, evidence sealing, signed verdicts, journeys.",
+      "prefixes": ["echo.certforge.", "echo.certification_forge."],
+      "repo": "echoomegaprime/echo-certification-forge",
+      "app_repo": "echoomegaprime/echo-certification-forge-app",
+      "upstream": "http://127.0.0.1:8701",
+      "redact": false
+    },
+    "tracker": {
+      "title": "ECHO Build Tracker",
+      "summary": "Phase, objective, evidence and blocker tracking across the build fleet.",
+      "prefixes": ["echo.buildtracker."],
+      "repo": "echoomegaprime/echo-build-tracker-app",
+      "upstream": "http://127.0.0.1:8707",
+      "redact": false
+    },
+    "knowledge": {
+      "title": "ECHO Knowledge Forge",
+      "summary": "Documentation ingestion, embedding and retrieval over the ECHO corpus.",
+      "prefixes": ["echo.knowledge."],
+      "repo": "echoomegaprime/echo-knowledge-forge-app",
+      "upstream": "http://127.0.0.1:8702",
+      "redact": false
+    },
+    "fleet": {
+      "title": "ECHO Fleet Builder",
+      "summary": "Fleet build orchestration, governed automation, and fleet digital twin state.",
+      "prefixes": ["echo.fleet.", "echo.fleet_twin."],
+      "repo": "echoomegaprime/echo-fleet-builder-app",
+      "app_repo": "echoomegaprime/echo-fleet-roles",
+      "upstream": "http://127.0.0.1:8703",
+      "redact": false
+    },
+    "sentinel": {
+      "title": "ECHO Release Sentinel",
+      "summary": "Release monitoring, regression detection, rollback readiness.",
+      "prefixes": ["echo.sentinel."],
+      "repo": "echoomegaprime/echo-release-sentinel",
+      "upstream": "http://127.0.0.1:8704",
+      "redact": false
+    },
+    "arcanum": {
+      "title": "ECHO Arcanum",
+      "summary": "Capability discovery, reusable-pattern search, prompt enrichment.",
+      "prefixes": ["echo.arcanum."],
+      "repo": "echoomegaprime/echo-arcanum-app",
+      "upstream": "http://127.0.0.1:8705",
+      "redact": false
+    },
+    "vault": {
+      "title": "ECHO Vault",
+      "summary": "Self-hosted encrypted secrets. Names, counts and audit only - values never leave the gate.",
+      "prefixes": ["echo.vault."],
+      "repo": "echoomegaprime/echo-vault",
+      "upstream": null,
+      "redact": true,
+      "notes": "Vault A is canonical: /home/forge/echo-worker-server/data/vault.db, keyed on service alone."
+    },
+    "oauth": {
+      "title": "ECHO OAuth",
+      "summary": "GitHub OAuth identity broker plus OAuth Forge provider/token lifecycle.",
+      "prefixes": ["echo.oauth.", "echo.oauth_forge."],
+      "repo": "echoomegaprime/echo-oauth",
+      "upstream": "http://127.0.0.1:8708",
+      "redact": true
+    },
+    "ghgateway": {
+      "title": "ECHO GitHub App Gateway",
+      "summary": "Fixed-route ingress and repo-facing GitHub operations for the ECHO App suite.",
+      "prefixes": ["echo.github."],
+      "repo": "echoomegaprime/echo-github-app-gateway",
+      "upstream": "https://github.echo-op.com",
+      "redact": true
+    },
+    "sdk": {
+      "title": "ECHO SDK Core",
+      "summary": "Registry SQL, library-first function search, and composite capability chains.",
+      "prefixes": ["echo.psql.", "echo.functions.", "echo.composite."],
+      "repo": "echoomegaprime/echo-sdk-app",
+      "upstream": "http://127.0.0.1:8706",
+      "redact": false
+    },
+    "steward": {
+      "title": "ECHO Repo Steward",
+      "summary": "Policy-driven repository hygiene, governance and maintenance.",
+      "prefixes": ["echo.repos.", "echo.steward."],
+      "repo": "echoomegaprime/echo-repo-steward",
+      "upstream": "http://127.0.0.1:8700",
+      "redact": false
+    },
+    "qcoder": {
+      "title": "ECHO QCoder",
+      "summary": "Governed Qwen coding terminal, MCP tools, skills and autonomous builder workflows.",
+      "prefixes": ["echo.qcoder.", "echo.qwen.", "echo.llm."],
+      "repo": "echoomegaprime/echo-qcoder",
+      "upstream": null,
+      "redact": false
+    }
+  }
+}
